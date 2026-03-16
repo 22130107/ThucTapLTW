@@ -1,0 +1,71 @@
+.product-type-wrap{
+
+    margin-top: 15px;
+    float: right;
+    width: 77%;
+    height: auto;
+    top: -5px;
+    right: -2px;
+    position: relative;
+    z-index: 1;
+}
+.product-type-grid{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(6,1fr); /* 6 cột cố định */
+
+}
+.product-type-card{
+    margin:3px;
+    position:relative;
+    background:#fff;
+    border:1px solid #9aa5b1;
+    border-radius: 5px;
+    padding:10px;
+   height:145px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    transition:border-color .15s ease, transform .12s ease;
+}
+
+.product-type-badge{
+    position:absolute;
+    right:8px;top:8px;
+    background:var(--badge);
+    color:#fff;
+    font-weight:700;
+    font-size:12px;
+    line-height:1;
+    padding:3px 6px;
+    border-radius:6px;
+}
+.product-type-thumb{
+    width:40px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+}
+.product-type-thumb img{
+    max-width:100px;
+    max-height:100px;
+    object-fit:contain}
+.product-type-name{font-size:15px;
+    text-align:center;
+    overflow:hidden;
+    text-overflow:ellipsis}
+
+.product-type-actions{
+    display:flex;
+    justify-content: center;
+    padding:12px
+}
+.btn-more{padding:9px 14px;border-radius:10px;border:1px solid #cfe0ff;background:#f2f6ff;color:#1a54ff;cursor:pointer}
+.btn-more:hover{background:#e8f0ff}
+
+.product-type-card.is-hidden{display:none}
+.product-type-card:hover .product-type-name {
+    color: red;
+}

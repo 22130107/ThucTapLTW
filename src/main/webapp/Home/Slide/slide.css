@@ -1,0 +1,46 @@
+/* CSS giữ nguyên ý tưởng */
+#slider{
+    float: right;
+    position: relative;
+    overflow: hidden;
+    width: 76.5%;
+    height: 300px;
+    margin: auto;
+    top: 5px;
+    right: 1px;
+    border-radius: 5px;
+}
+#slider .slides{ display:flex;
+    transition:transform .5s ease; }
+#slider .slides img{
+    width:100%;
+    height: 300px;
+    flex:0 0 100%;
+    display:block;
+}
+#slider .nav{
+    position:absolute; top:50%;
+    transform:translateY(-50%);
+    background:#fff8; border:0;
+    padding:.4rem .6rem;
+    cursor:pointer; }
+#slider .nav.prev{
+    left:.5rem; }
+
+#slider .nav.next{
+    right:.5rem; }
+#slider .dots{
+    font-size: 1px;
+    position:absolute;
+    left:50%; bottom:.75rem;
+    transform:translateX(-50%);
+    display:flex; gap:.4rem;
+}
+#slider .dots button{
+    width:.4rem; height:.4rem;
+    border-radius:50%; border:0;
+    cursor:pointer; }
+#slider .dots button.active{
+    background:#fff;
+}
+

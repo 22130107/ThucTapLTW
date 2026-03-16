@@ -1,0 +1,142 @@
+.category {
+    float: left;
+    position: relative;
+    z-index: 10;
+    margin-top: 5px;
+    background-color: #ffffff;
+    padding: 10px;
+    height: 610px;
+}
+.category-sidebar {
+    margin-top: 30px;
+    display: flow-root;
+    width: var(--sidebar-w);
+    border: 1px solid var(--divider);
+    width: 100%;
+    height: auto;
+    background-color: #ffffff;
+}
+
+.category-header {
+
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    font-weight: 700;
+    border-bottom: 1px solid #c8c8c8;
+    width: 230px;
+}
+
+.burger {
+    width: 26px;
+    height: 18px;
+    position: relative;
+    bottom: 3px;
+    margin-right: 8px;
+}
+
+
+
+.category-list {
+    float: left;
+
+    max-height: 600px;
+    width: 200px;
+}
+.category-item span{
+    font-size: 14px;
+}
+.category-item {
+    position: relative;
+    padding: 10px 14px;
+    gap: 10px;
+    width: 230px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom:5px ;
+}
+
+.category-item img {
+    position: relative;
+    top: 8px;
+    width: 30px;
+    height: 30px;
+    margin: 0 10px 0 0;
+    object-fit: contain;
+}
+
+.category-item:hover {
+    background: #f49f9f;
+    transform: translateX(4px);
+}
+.category-item .chevron {
+    position: absolute;
+
+    right: 10px;
+    top: 50%;
+    translate: 0 -50%;
+    font-weight: 700;
+    opacity: 0;
+    transition: all .15s ease;
+    user-select: none;
+    pointer-events: auto; /* cho phép hover vào chính nó */
+    color: #9aa5b1;
+}
+/* ====== RESET LINK ====== */
+.category-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+    /* để toàn bộ hàng là vùng bấm */
+}
+.category-link:visited{ color:inherit; }
+
+/* ====== HÀNG DANH MỤC (a > .category-item) ====== */
+.category-link .category-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    background:#fff;
+    transition:background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+/* hover/active đẹp mắt */
+.category-link:hover .category-item{
+    background:linear-gradient(90deg, #e53935, #ff7043);                 /* màu bạn đang dùng */
+    transform:translateX(4px);
+    box-shadow:0 4px 12px rgba(0,0,0,.06);
+    color: white;
+}
+.category-link:active .category-item{
+    transform:translateX(2px);
+    filter:brightness(.98);
+
+}
+
+
+/* icon + text */
+.category-item img{
+    width:30px;height:30px;flex:0 0 30px;
+    object-fit:contain;
+}
+.category-item span{
+    font-size:14px;
+    color:#222;
+    line-height:1.35;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* bo góc item đầu/cuối, bỏ đường kẻ cuối cùng */
+.category-list .category-link:last-child .category-item{
+    border-bottom:none;
+    color: white;
+}
+.category-list .category-link:first-child .category-item{
+    color: white;
+}
+
+
+
