@@ -1,0 +1,123 @@
+.content{
+        margin: 5px auto;
+        height: auto;
+    background-color: rgb(247 248 249);
+
+}
+.feature-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(32px, 8vw, 140px);
+    padding: 22px 16px;
+    background: #fff;
+    border-top: 1px solid #eef0f2;
+    border-bottom: 1px solid #eef0f2;
+    margin: 0 0 5px 0;
+}
+
+.feature {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: #222;
+    font-size: 18px;
+    line-height: 1.4;
+    white-space: nowrap;
+    transition: transform .2s ease;
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    display: block;
+}
+
+.feature-text {
+    font-weight: 500;
+}
+
+/* Hover nhẹ nhàng (tuỳ chọn) */
+.feature:hover { transform: translateY(-2px); }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .feature-strip { flex-wrap: wrap; gap: 18px 40px; }
+}
+@media (max-width: 480px) {
+    .feature { width: 100%; justify-content: center; }
+}
+
+/* ====== Footer – Thiết bị y tế ====== */
+.ft-health{
+    display:grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+    gap:28px;
+    padding:12px 0 6px;
+    font:14px/1.5 Arial, Helvetica, sans-serif;
+    background-color: white;
+}
+
+.ft-col h4{
+    margin:0 0 10px; font-size:16px; font-weight:700; color:#222;
+}
+
+/* reset list */
+.ft-list,.ft-links,.ft-social{ list-style:none; margin:0; padding:0; }
+
+/* cột 1 */
+.ft-list li{ margin:6px 0; color:#333; }
+.ft-flag{
+    margin-top:6px;
+    position:relative;
+    padding-left:18px;
+}
+.ft-flag::before{
+    content:""; width:8px; height:8px; border-radius:50%;
+    background:#e53935; position:absolute; left:0; top:8px;
+}
+.ft-time{ display:flex; flex-direction:column; gap:2px; color:#666; margin:10px 0 6px; }
+.tel{ color:#0a66c2; text-decoration:none; font-weight:600; }
+.tel:hover{ text-decoration:underline; }
+
+.ft-zalo{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+.ft-zalo img{ width:26px; height:26px; object-fit:contain; }
+.ft-zalo a{ color:#0a66c2; text-decoration:none; }
+.ft-zalo a:hover{ text-decoration:underline; }
+
+/* cột 2–4 */
+.ft-links li{ margin:6px 0; }
+.ft-links a{ color:#222; text-decoration:none; }
+.ft-links a:hover{ color:#0a66c2; text-decoration:underline; }
+
+/* cột 5 – social */
+.ft-social li{ display:flex; align-items:center; gap:8px; margin:6px 0; }
+.ft-social img{ width:28px; height:28px; border-radius:50%; object-fit:cover; }
+.ft-social a{ display:flex; align-items:center; gap:8px; color:#222; text-decoration:none; }
+.ft-social a:hover{ color:#0a66c2; }
+
+.ft-lang{ margin-top:8px; font-size:13px; color:#666; }
+.ft-lang a{ color:#0a66c2; text-decoration:none; }
+.ft-lang a:hover{ text-decoration:underline; }
+
+/* khoảng cách cột xa giống ảnh */
+.ft-col:not(:last-child){ padding-right:20px; }
+
+/* ====== Responsive ====== */
+@media (max-width: 1100px){
+    .ft-health{ grid-template-columns: 1fr 1fr 1fr 1fr; }
+}
+@media (max-width: 900px){
+    .ft-health{ grid-template-columns: 1fr 1fr; row-gap:22px; }
+}
+@media (max-width: 560px){
+    .ft-health{ grid-template-columns: 1fr; }
+    .ft-col:not(:last-child){ padding-right:0; }
+}
+
+.footer {
+    max-width: 1160px;
+    margin: 0 auto;
+}
+
