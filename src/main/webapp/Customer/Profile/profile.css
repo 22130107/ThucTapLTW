@@ -1,0 +1,129 @@
+/* Reset mặc định */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', Arial, sans-serif;
+}
+
+/* =================== BỐ CỤC CHÍNH =================== */
+.container {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    gap: 15px;
+    padding: 35px 140px 8px; /* Đã cập nhật padding cho giống style cũ */
+    background-color: #f8f8f8;
+}
+
+/* =================== PHẦN PROFILE =================== */
+.profile {
+    flex: 1;
+    background: white;
+}
+
+.profile-header {
+    margin-bottom: 30px;
+    padding: 30px;
+    text-align: center;
+}
+
+.avatar-large {
+    width: 100px;
+    height: 100px;
+    background-color: #bb5e41;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 10px;
+}
+
+.change-avatar {
+    background: none;
+    border: none;
+    color: #0a66c2;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Bảng thông tin */
+.info-table {
+    width: 100%;
+    margin-top: -10px;
+    padding: 0px 190px;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 100px;
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+    text-align: left;
+}
+
+/* Hàng có thể chỉnh sửa (dùng cho FORM) */
+.info-row.editable {
+    border-bottom: 1px solid #ddd;
+}
+
+.label {
+    color: #555;
+    font-size: 15px;
+}
+
+.value {
+    font-size: 15px;
+}
+
+/* Style cho Input khi sửa */
+.info-row input.value {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+}
+
+.info-row input.value:focus {
+    border-color: #0a66c2;
+    outline: none;
+}
+
+.value.long-text {
+    line-height: 1.5;
+}
+
+/* Nút Lưu và Action */
+.action, .info-row button.action {
+    color: #0a66c2;
+    font-size: 15px;
+    cursor: pointer;
+    justify-self: end;
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: none; /* Bỏ gạch chân cho thẻ a */
+}
+
+.info-row button.action {
+    color: white;
+    background-color: #0a66c2;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.info-row button.action:hover {
+    background-color: #084c98;
+}
+
+.verified {
+    color: #2ecc71;
+    margin-left: 5px;
+}
