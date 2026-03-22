@@ -1,0 +1,275 @@
+
+body {
+    background-color: #f8f8f8;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', Arial, sans-serif;
+}
+
+.user-container {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    gap: 15px;
+    padding: 0 140px;
+    padding-top: 35px;
+    padding-bottom: 8px;
+}
+
+/* ======= Nội dung chính ======= */
+.user-container .content {
+    flex: 1;
+    background-color: white;
+    padding: 20px 30px;
+    border-left: 1px solid #eee;
+}
+
+/* ======= Tabs ======= */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #f1f1f1;
+    margin-bottom: 20px;
+}
+
+.tab {
+    background: none;
+    border: none;
+    outline: none;
+    padding: 12px 25px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #555;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    color: #d32f2f;
+}
+
+.tab.active {
+    color: #d32f2f;
+    font-weight: bold;
+    border-bottom: 2px solid #d32f2f;
+}
+
+/* ======= Thanh tìm kiếm ======= */
+.search-box {
+    display: flex;
+    align-items: center;
+    border: 3px solid #f8f8f8;
+    overflow: hidden;
+    max-width: 450px;
+    margin-bottom: 30px;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+
+.search-box button {
+    background-color: #f5f5f5;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 18px;
+}
+
+/* ======= Trạng thái trống ======= */
+.empty-state {
+    text-align: center;
+    margin-top: 60px;
+    color: #777;
+}
+
+.empty-state img {
+    width: 80px;
+    opacity: 0.8;
+}
+
+.empty-state p {
+    font-size: 16px;
+    margin-top: 12px;
+}
+/**/
+/* --- APPOINTMENT CARD (Phần quan trọng nhất) --- */
+.appointment-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden; /* Để bo góc hoạt động với header */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.appointment-card:hover {
+    transform: translateY(-3px); /* Hiệu ứng nhấc lên khi hover */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border-color: #d32f2f;
+}
+
+/* 1. Card Header */
+.app-header {
+    background-color: #fafafa;
+    padding: 12px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-id {
+    font-weight: 700;
+    color: #333;
+    font-size: 15px;
+}
+
+.app-date {
+    font-size: 13px;
+    color: #666;
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid #ccc;
+}
+
+/* Status Badges - Màu sắc cho từng trạng thái */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-warning { background-color: #fff3e0; color: #ef6c00; } /* Chờ xác nhận (Cam) */
+.status-primary { background-color: #e3f2fd; color: #1976d2; } /* Đã xác nhận (Xanh dương) */
+.status-success { background-color: #e8f5e9; color: #2e7d32; } /* Hoàn thành (Xanh lá) */
+.status-danger  { background-color: #ffebee; color: #c62828; } /* Hủy (Đỏ) */
+
+/* 2. Card Body */
+.app-body {
+    padding: 20px;
+}
+
+.app-item {
+    display: flex;
+    gap: 15px;
+}
+
+.item-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #fbe9e7; /* Nền đỏ nhạt */
+    color: #d32f2f;
+    border-radius: 50%; /* Hình tròn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+}
+
+.item-name:hover {
+    color: #d32f2f;
+}
+
+.item-detail {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.item-detail i {
+    color: #999;
+    width: 16px;
+    text-align: center;
+}
+
+/* 3. Admin Note - Làm nổi bật */
+.item-note {
+    margin-top: 12px;
+    padding: 10px 15px;
+    background-color: #fff8e1; /* Nền vàng nhạt */
+    border-left: 4px solid #ffc107; /* Viền vàng */
+    border-radius: 4px;
+    font-size: 13px;
+    color: #5d4037;
+    line-height: 1.4;
+}
+
+.item-note i {
+    color: #ffa000;
+    margin-right: 5px;
+}
+
+/* 4. Card Footer */
+.app-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #f0f0f0;
+    text-align: right;
+    background-color: #fff;
+}
+
+.btn-action {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+/* Nút Đặt lại - Màu chính */
+.btn-action:not(.btn-cancel) {
+    background-color: #d32f2f;
+    color: white;
+    box-shadow: 0 2px 4px rgba(211, 47, 47, 0.2);
+}
+
+.btn-action:not(.btn-cancel):hover {
+    background-color: #b71c1c;
+    box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+}
+
+/* Nút Hủy - Màu trắng viền đỏ */
+.btn-cancel {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    color: #666;
+}
+
+.btn-cancel:hover {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border-color: #ef9a9a;
+}
+
+/* Helper Classes */
+.hidden { display: none !important; }
+.empty-state { text-align: center; padding: 40px; color: #888; }

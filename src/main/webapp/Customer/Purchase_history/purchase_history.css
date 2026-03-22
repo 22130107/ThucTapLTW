@@ -1,0 +1,98 @@
+
+body {
+  background-color: #f8f8f8;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+.user-container {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 70px);
+  gap: 15px;
+  padding: 0 140px;
+  padding-top: 35px;
+  padding-bottom: 8px;
+}
+
+/* ======= Nội dung chính ======= */
+.user-container .content {
+  flex: 1;
+  background-color: white;
+  padding: 20px 30px;
+  border-left: 1px solid #eee;
+}
+
+/* ======= Tabs ======= */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #f1f1f1;
+  margin-bottom: 20px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  outline: none;
+  padding: 12px 25px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #555;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  color: #d32f2f;
+}
+
+.tab.active {
+  color: #d32f2f;
+  font-weight: bold;
+  border-bottom: 2px solid #d32f2f;
+}
+
+/* ======= Thanh tìm kiếm ======= */
+.search-box {
+  display: flex;
+  align-items: center;  
+  border: 3px solid #f8f8f8;
+  overflow: hidden;
+  max-width: 450px;
+  margin-bottom: 30px;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.search-box button {
+  background-color: #f5f5f5;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 18px;
+}
+
+/* ======= Trạng thái trống ======= */
+.empty-state {
+  text-align: center;
+  margin-top: 60px;
+  color: #777;
+}
+
+.empty-state img {
+  width: 80px;
+  opacity: 0.8;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin-top: 12px;
+}
