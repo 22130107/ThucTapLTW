@@ -10,12 +10,11 @@ import java.sql.ResultSet;
 
 public class UserDAO {
 
-    public User checkLogin(String username, String password) {
-        String query = "SELECT * FROM accounts WHERE Username = ? AND PasswordHash = ? AND Status = 'Active'";
+    public User getUserByUsername(String username) {
+        String query = "SELECT * FROM accounts WHERE Username = ? AND Status = 'Active'";
         try (Connection conn = DBConnect.get();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, username);
-            ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return new User(
@@ -161,7 +160,8 @@ public class UserDAO {
 
     public void registerGoogle(String email, String name, String avatarUrl) {
         String username = email.split("@")[0];
-        String randomPass = "GOOGLE_LOGIN_" + System.currentTimeMillis();
+        String randomPass = vn.edu.hcmuaf.fit.service.UserService.getInstance().hashPassword(
+                "GOOGLE_LOGIN_" + System.currentTimeMillis());
         register(username, randomPass, email);
     }
 }
