@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f4ff;
+    overflow: hidden;
+}
+
+/* ── Background blobs ── */
+.bg-blobs {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    animation: float 8s ease-in-out infinite;
+}
+
+.blob-1 {
+    width: 480px;
+    height: 480px;
+    background: #6366f1;
+    top: -120px;
+    left: -120px;
+    animation-delay: 0s;
+}
+
+.blob-2 {
+    width: 360px;
+    height: 360px;
+    background: #06b6d4;
+    bottom: -80px;
+    right: -80px;
+    animation-delay: -4s;
+}
+
+.blob-3 {
+    width: 260px;
+    height: 260px;
+    background: #818cf8;
+    top: 50%;
+    left: 55%;
+    animation-delay: -2s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%       { transform: translateY(-30px) scale(1.06); }
+}
+
+/* ── Card ── */
+.card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 28px;
+    padding: 56px 64px;
+    max-width: 560px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(99, 102, 241, 0.15);
+    animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Error code ── */
+.error-code {
+    font-size: 9rem;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, #6366f1, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -4px;
+    user-select: none;
+}
+
+/* ── Icon ── */
+.icon-wrap {
+    margin: 16px auto 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+    animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35); }
+    50%       { box-shadow: 0 8px 40px rgba(99, 102, 241, 0.55); }
+}
+
+.icon-wrap svg {
+    width: 36px;
+    height: 36px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ── Typography ── */
+h1 {
+    margin-top: 24px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1e1b4b;
+}
+
+p {
+    margin-top: 12px;
+    font-size: 1rem;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+/* ── Actions ── */
+.actions {
+    margin-top: 36px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border: none;
+}
+
+.btn:hover { transform: translateY(-2px); }
+
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1, #06b6d4);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:hover { box-shadow: 0 10px 28px rgba(99, 102, 241, 0.5); }
+
+.btn-secondary {
+    background: rgba(99, 102, 241, 0.08);
+    color: #6366f1;
+    border: 1.5px solid rgba(99, 102, 241, 0.25);
+}
+
+.btn-secondary:hover { background: rgba(99, 102, 241, 0.14); }
+
+/* ── Hint ── */
+.hint {
+    margin-top: 28px;
+    font-size: 0.82rem;
+    color: #94a3b8;
+}
