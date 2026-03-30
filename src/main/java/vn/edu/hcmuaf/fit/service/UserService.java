@@ -1,11 +1,8 @@
 package vn.edu.hcmuaf.fit.service;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import vn.edu.hcmuaf.fit.dao.UserDAO;
 import vn.edu.hcmuaf.fit.model.User;
-
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class UserService {
     private static final UserService instance = new UserService();
@@ -18,14 +15,23 @@ public class UserService {
     }
 
     public User checkLogin(String username, String password) {
-        return new UserDAO().checkLogin(username, hashPassword(password));
+        UserDAO dao = new UserDAO();
+        User user = dao.getUserByUsername(username);
+        if (user == null) return null;
+
+        boolean matched = BCrypt.verifyer()
+                .verify(password.toCharArray(), user.getPasswordHash())
+                .verified;
+        return matched ? user : null;
     }
 
     public boolean checkUserExist(String username) {
+
         return new UserDAO().checkUserExist(username);
     }
 
     public boolean checkEmailExist(String email) {
+
         return new UserDAO().checkEmailExist(email);
     }
 
@@ -35,32 +41,20 @@ public class UserService {
 
     public boolean changePassword(int accountID, String oldPassword, String newPassword) {
         UserDAO dao = new UserDAO();
-
         String currentHashInDB = dao.getPasswordById(accountID);
 
-        String oldPasswordInputHash = hashPassword(oldPassword);
+        if (currentHashInDB == null) return false;
 
-        if (currentHashInDB == null || !currentHashInDB.equals(oldPasswordInputHash)) {
-            return false;
-        }
+        boolean oldPasswordMatches = BCrypt.verifyer()
+                .verify(oldPassword.toCharArray(), currentHashInDB)
+                .verified;
 
-        String newPasswordHash = hashPassword(newPassword);
+        if (!oldPasswordMatches) return false;
 
-        return dao.changePassword(accountID, newPasswordHash);
+        return dao.changePassword(accountID, hashPassword(newPassword));
     }
 
     public String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] messageDigest = md.digest(password.getBytes());
-            BigInteger no = new BigInteger(1, messageDigest);
-            String hashtext = no.toString(16);
-            while (hashtext.length() < 32) {
-                hashtext = "0" + hashtext;
-            }
-            return hashtext;
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        return BCrypt.withDefaults().hashToString(12, password.toCharArray());
     }
 }
