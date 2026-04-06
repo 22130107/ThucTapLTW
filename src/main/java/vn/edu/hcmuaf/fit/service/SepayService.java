@@ -21,4 +21,20 @@ public class SepayService {
     private SepayService() {}
 
     public static SepayService getInstance() { return INSTANCE; }
-
+
+    public QrPaymentData createQrPayment(int orderId) {
+        Order order = orderDAO.getById(orderId);
+        if (order == null)
+            throw new IllegalArgumentException("[SepayService] Order not found: " + orderId);
+
+        long amount = (long) order.getTotalAmount();
+        String content = SepayUtil.buildTransferContent(orderId);
+        String qrImageUrl = SepayUtil.buildQrImageUrl(amount, content);
+        int expiryMinutes = SepayConfig.QR_EXPIRY_MINUTES();
+
+        LOGGER.info("[SepayService] QR created orderId=" + orderId
+                + " amount=" + amount + " content=" + content);
+
+        return new QrPaymentData(orderId, amount, content, qrImageUrl,
+                SepayConfig.BANK_CODE(), SepayConfig.BANK_ACCOUNT(),
+                SepayConfig.ACCOUNT_NAME(), expiryMinutes);
