@@ -37,4 +37,34 @@ public class SepayService {
 
         return new QrPaymentData(orderId, amount, content, qrImageUrl,
                 SepayConfig.BANK_CODE(), SepayConfig.BANK_ACCOUNT(),
-                SepayConfig.ACCOUNT_NAME(), expiryMinutes);
+                SepayConfig.ACCOUNT_NAME(), expiryMinutes);
+    }
+
+    public WebhookResult handleWebhook(String rawBody) {
+        LOGGER.info("[SepayService] Webhook body: " + rawBody);
+
+        JsonObject json;
+        try {
+            json = JsonParser.parseString(rawBody).getAsJsonObject();
+        } catch (Exception e) {
+            LOGGER.warning("[SepayService] Cannot parse JSON: " + e.getMessage());
+            return WebhookResult.failure("Invalid JSON: " + e.getMessage());
+        }
+
+        String secret = SepayConfig.WEBHOOK_SECRET();
+        if (secret != null && !secret.isEmpty()) {
+            String checksum = getStr(json, "checksum");
+            if (!SepayUtil.verifyWebhookSignature(rawBody, checksum, secret)) {
+                LOGGER.warning("[SepayService] Checksum mismatch – rejecting");
+                return WebhookResult.failure("Invalid checksum");
+            }
+            LOGGER.info("[SepayService] Checksum OK");
+        } else {
+            LOGGER.warning("[SepayService] SEPAY_WEBHOOK_SECRET not set – skipping checksum verification");
+        }
+
+        String transferType = getStr(json, "transferType");
+        if (!"in".equalsIgnoreCase(transferType)) {
+            LOGGER.info("[SepayService] Ignoring non-incoming transfer: " + transferType);
+            return WebhookResult.ignored("Not incoming");
+        }
