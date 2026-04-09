@@ -67,4 +67,32 @@ public class SepayService {
         if (!"in".equalsIgnoreCase(transferType)) {
             LOGGER.info("[SepayService] Ignoring non-incoming transfer: " + transferType);
             return WebhookResult.ignored("Not incoming");
+        }
+
+        String code = getStr(json, "code");
+        String content = getStr(json, "content");
+        LOGGER.info("[SepayService] code=" + code + " content=" + content);
+
+        int orderId = parseOrderId(code);
+        if (orderId == -1) {
+            LOGGER.info("[SepayService] code field empty/unparseable – trying content field");
+            orderId = parseOrderId(content);
+        }
+        if (orderId == -1) {
+            LOGGER.warning("[SepayService] Cannot find orderId in code='" + code
+                    + "' content='" + content + "'");
+            return WebhookResult.failure("Cannot identify order from code/content");
+        }
+        LOGGER.info("[SepayService] Resolved orderId=" + orderId);
+
+        Order order = orderDAO.getById(orderId);
+        if (order == null) {
+            LOGGER.warning("[SepayService] Order not found: " + orderId);
+            return WebhookResult.failure("Order not found: " + orderId);
+        }
+
+        PaymentTransaction existing = txnDAO.findSuccessByOrderId(orderId);
+        if (existing != null) {
+            LOGGER.info("[SepayService] Duplicate – orderId=" + orderId + " already paid");
+            return WebhookResult.ignored("Already paid");
         }
