@@ -60,18 +60,59 @@
                         </div>
                         <section id="dm-section">
 
+                            <section class="home-intro" aria-label="Banner nổi bật">
+                                <div class="home-intro-carousel" data-autoplay="true">
+                                    <div class="home-intro-track">
+                                        <div class="home-intro-slide is-active">
+                                            <img src="https://thietbiyte24h.net/wp-content/uploads/2024/06/banner-trang-chu-b46-2.jpg"
+                                                alt="Banner thiết bị y tế B46" loading="eager" fetchpriority="high">
+                                        </div>
+                                        <div class="home-intro-slide">
+                                            <img src="https://thietbiyte24h.net/wp-content/uploads/2024/06/banner-trang-chu-c88-2.jpg"
+                                                alt="Banner thiết bị y tế C88" loading="lazy">
+                                        </div>
+                                        <div class="home-intro-slide">
+                                            <img src="https://thietbiyte24h.net/wp-content/uploads/2024/06/banner-trang-chu-s108-2.jpg"
+                                                alt="Banner thiết bị y tế S108" loading="lazy">
+                                        </div>
+                                    </div>
+
+                                    <button class="home-intro-arrow prev" type="button" aria-label="Banner trước">
+                                        &#10094;
+                                    </button>
+                                    <button class="home-intro-arrow next" type="button" aria-label="Banner sau">
+                                        &#10095;
+                                    </button>
+
+                                    <div class="home-intro-dots" role="tablist" aria-label="Chọn banner">
+                                        <button class="home-intro-dot is-active" type="button" data-slide="0"
+                                            aria-label="Banner 1" aria-selected="true"></button>
+                                        <button class="home-intro-dot" type="button" data-slide="1"
+                                            aria-label="Banner 2" aria-selected="false"></button>
+                                        <button class="home-intro-dot" type="button" data-slide="2"
+                                            aria-label="Banner 3" aria-selected="false"></button>
+                                    </div>
+                                </div>
+                            </section>
+
 
                             <%-- Category Sections --%>
+                                <c:set var="stopRender" value="false" scope="page" />
                                 <c:forEach var="cat" items="${categories}">
-                                    <c:set var="catProducts" value="${categoryProducts[cat.categoryID]}" />
-                                    <c:if test="${not empty catProducts}">
-                                        <div class="dm-container">
-                                            <div class="dm-head">
-                                                <h2>${cat.categoryName}</h2>
-                                                <a class="dm-viewall" href="catalog?cid=${cat.categoryID}">Xem tất
-                                                    cả
-                                                    &gt;</a>
-                                            </div>
+                                    <c:if test="${cat.slug == 'thuc-pham-chuc-nang' || cat.categoryName == 'THỰC PHẨM CHỨC NĂNG'}">
+                                        <c:set var="stopRender" value="true" scope="page" />
+                                    </c:if>
+
+                                    <c:if test="${not stopRender}">
+                                        <c:set var="catProducts" value="${categoryProducts[cat.categoryID]}" />
+                                        <c:if test="${not empty catProducts}">
+                                            <div class="dm-container">
+                                                <div class="dm-head">
+                                                    <h2>${cat.categoryName}</h2>
+                                                    <a class="dm-viewall" href="catalog?cid=${cat.categoryID}">Xem tất
+                                                        cả
+                                                        &gt;</a>
+                                                </div>
 
                                             <%-- Product Grid (Max 12) --%>
                                                 <div class="dm-cats">
@@ -126,7 +167,9 @@
                                                     </div>
                                                     <button class="dm-nav dm-next" aria-label="Sau">&#10095;</button>
                                                 </div>
-                                        </div>
+                                            </div>
+                                        </c:if>
+
                                     </c:if>
                                 </c:forEach>
                         </section>
