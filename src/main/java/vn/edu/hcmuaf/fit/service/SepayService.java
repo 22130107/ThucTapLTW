@@ -95,4 +95,44 @@ public class SepayService {
         if (existing != null) {
             LOGGER.info("[SepayService] Duplicate – orderId=" + orderId + " already paid");
             return WebhookResult.ignored("Already paid");
-        }
+        }
+
+        long receivedAmount = getLong(json, "transferAmount");
+        long expectedAmount = (long) order.getTotalAmount();
+        boolean amountOk = receivedAmount >= expectedAmount;
+        LOGGER.info("[SepayService] Amount expected=" + expectedAmount
+                + " received=" + receivedAmount + " ok=" + amountOk);
+
+        String sepayTxnId = getStr(json, "id");
+        String gateway = getStr(json, "gateway");
+        String txnDate = getStr(json, "transactionDate");
+        String orderInfo = content != null ? content : (code != null ? code : "");
+        String status = amountOk ? "SUCCESS" : "AMOUNT_MISMATCH";
+
+        PaymentTransaction tx = new PaymentTransaction();
+        tx.setOrderId(orderId);
+        tx.setTxnRef("SEPAY_" + orderId + "_" + System.currentTimeMillis());
+        tx.setVnpTransactionNo(sepayTxnId);
+        tx.setAmount(receivedAmount);
+        tx.setBankCode(gateway);
+        tx.setPayDate(txnDate);
+        tx.setResponseCode(amountOk ? "00" : "99");
+        tx.setTransactionStatus(amountOk ? "00" : "99");
+        tx.setOrderInfo(orderInfo);
+        tx.setStatus(status);
+        tx.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+
+        int txId = txnDAO.save(tx);
+        LOGGER.info("[SepayService] Transaction saved id=" + txId
+                + " status=" + status + " orderId=" + orderId);
+
+        if (amountOk) {
+            orderDAO.updateStatus(orderId, "Processing");
+            LOGGER.info("[SepayService] Order " + orderId + " → Processing");
+            return WebhookResult.success(orderId, sepayTxnId, receivedAmount);
+        } else {
+            orderDAO.updateStatus(orderId, "PaymentMismatch");
+            return WebhookResult.failure("Amount mismatch: expected " + expectedAmount
+                    + " got " + receivedAmount);
+        }
+    }
