@@ -135,4 +135,111 @@ public class SepayService {
             return WebhookResult.failure("Amount mismatch: expected " + expectedAmount
                     + " got " + receivedAmount);
         }
-    }
+    }
+
+    public PaymentStatus checkPaymentStatus(int orderId) {
+        Order order = orderDAO.getById(orderId);
+        if (order == null) return PaymentStatus.NOT_FOUND;
+
+        PaymentTransaction tx = txnDAO.findSuccessByOrderId(orderId);
+        if (tx != null) return PaymentStatus.SUCCESS;
+
+        String s = order.getStatus();
+        if ("Cancelled".equalsIgnoreCase(s)) return PaymentStatus.CANCELLED;
+
+        return PaymentStatus.PENDING;
+    }
+
+    private static String getStr(JsonObject json, String key) {
+        try {
+            return json.has(key) && !json.get(key).isJsonNull() ? json.get(key).getAsString().trim() : null;
+        } catch (Exception e) { return null; }
+    }
+
+    private static long getLong(JsonObject json, String key) {
+        try {
+            return json.has(key) && !json.get(key).isJsonNull()
+                    ? json.get(key).getAsLong() : 0L;
+        } catch (Exception e) { return 0L; }
+    }
+
+    static int parseOrderId(String s) {
+        if (s == null || s.isBlank()) return -1;
+        java.util.regex.Matcher m =
+                java.util.regex.Pattern.compile("(?i)DH\\s*(\\d+)").matcher(s);
+        if (m.find()) {
+            try { return Integer.parseInt(m.group(1)); } catch (NumberFormatException ignored) {}
+        }
+        String trimmed = s.trim();
+        if (trimmed.matches("\\d+")) {
+            try { return Integer.parseInt(trimmed); } catch (NumberFormatException ignored) {}
+        }
+        return -1;
+    }
+
+    public enum PaymentStatus { PENDING, SUCCESS, CANCELLED, NOT_FOUND }
+
+    public static final class QrPaymentData {
+        private final int orderId;
+        private final long amount;
+        private final String transferContent;
+        private final String qrImageUrl;
+        private final String bankCode;
+        private final String bankAccount;
+        private final String accountName;
+        private final int expiryMinutes;
+
+        public QrPaymentData(int orderId, long amount, String transferContent,
+                             String qrImageUrl, String bankCode, String bankAccount,
+                             String accountName, int expiryMinutes) {
+            this.orderId = orderId;
+            this.transferContent = transferContent;
+            this.qrImageUrl = qrImageUrl;
+            this.bankCode = bankCode;
+            this.bankAccount = bankAccount;
+            this.accountName = accountName;
+            this.amount = amount;
+            this.expiryMinutes = expiryMinutes;
+        }
+
+        public int getOrderId() { return orderId; }
+        public long getAmount() { return amount; }
+        public String getTransferContent() { return transferContent; }
+        public String getQrImageUrl() { return qrImageUrl; }
+        public String getBankCode() { return bankCode; }
+        public String getBankAccount() { return bankAccount; }
+        public String getAccountName() { return accountName; }
+        public int getExpiryMinutes() { return expiryMinutes; }
+    }
+
+    public static final class WebhookResult {
+        public enum Type { SUCCESS, FAILURE, IGNORED }
+        private final Type type;
+        private final int orderId;
+        private final String sepayTxnId;
+        private final long amount;
+        private final String message;
+
+        private WebhookResult(Type t, int id, String txnId, long amt, String msg) {
+            this.type = t; this.orderId = id; this.sepayTxnId = txnId;
+            this.amount = amt; this.message = msg;
+        }
+
+        public static WebhookResult success(int id, String txnId, long amt) {
+            return new WebhookResult(Type.SUCCESS, id, txnId, amt, null);
+        }
+        public static WebhookResult failure(String msg) {
+            return new WebhookResult(Type.FAILURE, -1, null, 0, msg);
+        }
+        public static WebhookResult ignored(String msg) {
+            return new WebhookResult(Type.IGNORED, -1, null, 0, msg);
+        }
+
+        public boolean isSuccess() { return type == Type.SUCCESS; }
+        public boolean isFailure() { return type == Type.FAILURE; }
+        public int getOrderId() { return orderId; }
+        public String getSepayTxnId() { return sepayTxnId; }
+        public long getAmount() { return amount; }
+        public String getMessage() { return message; }
+    }
+}
