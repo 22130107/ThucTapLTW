@@ -49,4 +49,61 @@ public class SepayPaymentServlet extends HttpServlet {
         if (cart == null || cart.getData().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
-        }
+        }
+
+        String recipientName = request.getParameter("recipientName");
+        String recipientPhone = request.getParameter("recipientPhone");
+        String shippingAddress = request.getParameter("shippingAddress");
+        String toDistrictIdStr = request.getParameter("toDistrictId");
+        String toWardCode = request.getParameter("toWardCode");
+
+        if (isBlank(recipientName) || isBlank(recipientPhone)
+                || isBlank(shippingAddress) || isBlank(toDistrictIdStr) || isBlank(toWardCode)) {
+            request.setAttribute("error", "Vui lòng điền đầy đủ thông tin giao hàng.");
+            request.setAttribute("cart", cart);
+            request.getRequestDispatcher("/Checkout/checkout.jsp").forward(request, response);
+            return;
+        }
+
+        int toDistrictId;
+        try {
+            toDistrictId = Integer.parseInt(toDistrictIdStr);
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Quận/Huyện không hợp lệ.");
+            request.setAttribute("cart", cart);
+            request.getRequestDispatcher("/Checkout/checkout.jsp").forward(request, response);
+            return;
+        }
+
+        int orderId = OrderService.getInstance().placeOrderAndReturnId(
+                customerId, recipientName, recipientPhone,
+                shippingAddress, toDistrictId, toWardCode, "SEPAY");
+
+        if (orderId == -1) {
+            LOGGER.warning("[SepayPaymentServlet] placeOrderAndReturnId returned -1 for customerId=" + customerId);
+            request.setAttribute("error", "Đặt hàng thất bại. Vui lòng thử lại.");
+            request.setAttribute("cart", cart);
+            request.getRequestDispatcher("/Checkout/checkout.jsp").forward(request, response);
+            return;
+        }
+
+        CartService.getInstance().clearCart(customerId);
+        session.removeAttribute("cart");
+
+        LOGGER.info("[SepayPaymentServlet] Order created orderId=" + orderId + " – redirecting to QR page");
+
+        try {
+            vn.edu.hcmuaf.fit.util.SepayConfig.validate();
+            response.sendRedirect(request.getContextPath() + "/payment/sepay/qr?orderId=" + orderId);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "[SepayPaymentServlet] SePay config error", e);
+            request.setAttribute("error", "Không thể tạo QR thanh toán. Vui lòng thử lại sau.");
+            request.setAttribute("cart", cart);
+            request.getRequestDispatcher("/Checkout/checkout.jsp").forward(request, response);
+        }
+    }
+
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+}
