@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'vn.edu.hcmuaf.fit'
+version = '1.0-SNAPSHOT'
+description = 'webapp'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    // Servlet & JSP (provided by Tomcat at runtime - NOT bundled in WAR)
+    compileOnly libs.jakarta.servlet.jakarta.servlet.api
+    compileOnly libs.jakarta.servlet.jsp.jakarta.servlet.jsp.api
+
+    // JSTL
+    implementation libs.jakarta.servlet.jsp.jstl.jakarta.servlet.jsp.jstl.api
+    implementation libs.org.glassfish.web.jakarta.servlet.jsp.jstl
+    implementation libs.jakarta.el.jakarta.el.api
+
+    // JAX-RS / Jersey
+    implementation libs.org.glassfish.jersey.containers.jersey.container.servlet
+    implementation libs.org.glassfish.jersey.media.jersey.media.json.jackson
+    implementation libs.org.glassfish.jersey.inject.jersey.cdi2.se
+
+    // CDI / Weld
+    implementation libs.org.jboss.weld.se.weld.se.core
+
+    // Database
+    implementation libs.com.mysql.mysql.connector.j
+
+    // Utilities
+    implementation libs.com.google.code.gson.gson
+    implementation libs.org.apache.httpcomponents.fluent.hc
+    implementation libs.org.apache.httpcomponents.httpclient
+    implementation libs.com.sun.mail.javax.mail
+    implementation libs.org.apache.commons.commons.fileupload2.jakarta
+    implementation libs.commons.io.commons.io
+    implementation libs.at.favre.lib.bcrypt
+
+    // Test
+    testImplementation libs.org.junit.jupiter.junit.jupiter.api
+    testImplementation libs.org.junit.jupiter.junit.jupiter.engine
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
