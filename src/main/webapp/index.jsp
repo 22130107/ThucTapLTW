@@ -20,7 +20,6 @@
             </head>
 
             <body>
-                <%-- Redirect to /home if accessed directly --%>
                     <c:if test="${categories == null}">
                         <c:redirect url="/home" />
                     </c:if>

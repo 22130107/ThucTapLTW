@@ -46,6 +46,8 @@ public class LoginController extends HttpServlet {
 
                     Cart dbCart = CartService.getInstance().getCart(customerId);
                     session.setAttribute("cart", dbCart);
+
+                    vn.edu.hcmuaf.fit.util.CartCookieUtil.clearCartCookie(response);
                 }
             }
 

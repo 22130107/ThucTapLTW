@@ -70,6 +70,7 @@ public class AddToCartServlet extends HttpServlet {
                     cart.remove(id);
                 }
                 session.setAttribute("cart", cart);
+                vn.edu.hcmuaf.fit.util.CartCookieUtil.saveCartToCookie(response, cart);
             }
 
             jsonResponse.put("status", "success");
