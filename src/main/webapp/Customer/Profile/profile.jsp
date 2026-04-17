@@ -39,7 +39,7 @@
                                         font-family: 'Roboto', Arial, sans-serif;
                                     }
 
-                                    .container {
+                                    .profile-page-container {
                                         display: flex;
                                         width: 100%;
                                         min-height: calc(100vh - 70px);
@@ -48,7 +48,7 @@
                                         background-color: #f8f8f8;
                                     }
 
-                                    .profile {
+                                    .profile-main {
                                         flex: 1;
                                         background: white;
                                     }
@@ -265,14 +265,14 @@
                                         /includes/header.jsp) --%>
                                         <jsp:include page="/style/header/header.jsp" />
 
-                                        <main class="container">
+                                        <main class="profile-page-container">
 
                                             <%-- 3. NHÚNG SIDEBAR --%>
                                                 <%-- File này nằm ở thư mục webapp/User_sidebar/user_sidebar.jsp --%>
                                                     <jsp:include page="/Customer/User_sidebar/user_sidebar.jsp" />
 
                                                     <%-- 4. NỘI DUNG CHÍNH (FORM PROFILE) --%>
-                                                        <section class="profile">
+                                                        <section class="profile-main">
 
                                                             <%-- Hiển thị thông báo (1s mờ dần) --%>
                                                                 <c:if test="${not empty message}">
