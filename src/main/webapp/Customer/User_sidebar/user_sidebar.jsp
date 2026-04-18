@@ -6,12 +6,11 @@
 <c:set var="user" value="${sessionScope.auth}"/>
 <c:set var="customer" value="${sessionScope.customer}"/>
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
-<%--<c:set var="currentPath" value="${pageContext.request.servletPath}"/>--%>
 <c:set var="currentURI" value="${pageContext.request.requestURI}"/>
 
 <c:if test="${not empty user}">
     <aside class="sidebar">
-        <div class="profile">
+        <div class="sidebar-profile">
                 <%-- Hiển thị chữ cái đầu tiên cho Avatar --%>
             <div class="avatar">
                 <c:choose>
@@ -31,7 +30,7 @@
 
                 <%-- MỤC 1: THÔNG TIN TÀI KHOẢN (Lien kết đến /update-profile) --%>
                 <%-- Thêm class 'active' nếu đang ở trang Profile --%>
-            <li class="${currentPath == '/update-profile' ? 'active' : ''}">
+            <li class="${fn:contains(currentURI, '/update-profile') ? 'active' : ''}">
                 <a href="${contextPath}/update-profile">
                     <i class="fa-regular fa-user"></i> Thông tin tài khoản
                 </a>
