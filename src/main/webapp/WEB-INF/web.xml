@@ -21,4 +21,25 @@
         <exception-type>java.lang.Exception</exception-type>
         <location>/error/500.jsp</location>
     </error-page>
-</web-app>
+
+    <servlet>
+        <servlet-name>SepayPaymentServlet</servlet-name>
+        <servlet-class>vn.edu.hcmuaf.fit.controller.payment.SepayPaymentServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SepayPaymentServlet</servlet-name>
+        <url-pattern>/payment/sepay</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SepayQrServlet</servlet-name>
+        <servlet-class>vn.edu.hcmuaf.fit.controller.payment.SepayQrServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SepayQrServlet</servlet-name>
+        <url-pattern>/payment/sepay/qr</url-pattern>
+    </servlet-mapping>
+
+</web-app>
