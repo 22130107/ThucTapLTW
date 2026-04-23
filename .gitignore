@@ -34,5 +34,12 @@ build/
 ### VS Code ###
 .vscode/
 
+# Environment variables
+.env
+src/main/webapp/WEB-INF/.env
+
+### Gradle ###
+.gradle/
+
 ### Mac OS ###
 .DS_Store
