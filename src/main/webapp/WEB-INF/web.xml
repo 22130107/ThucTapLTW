@@ -42,4 +42,34 @@
         <url-pattern>/payment/sepay/qr</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>SepayWebhookServlet</servlet-name>
+        <servlet-class>vn.edu.hcmuaf.fit.controller.payment.SepayWebhookServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SepayWebhookServlet</servlet-name>
+        <url-pattern>/payment/sepay/webhook</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SepayStatusServlet</servlet-name>
+        <servlet-class>vn.edu.hcmuaf.fit.controller.payment.SepayStatusServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SepayStatusServlet</servlet-name>
+        <url-pattern>/payment/sepay/status</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SepaySuccessServlet</servlet-name>
+        <servlet-class>vn.edu.hcmuaf.fit.controller.payment.SepaySuccessServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SepaySuccessServlet</servlet-name>
+        <url-pattern>/payment/sepay/success</url-pattern>
+    </servlet-mapping>
+
 </web-app>
