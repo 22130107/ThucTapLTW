@@ -209,4 +209,175 @@
                     <div>
                         <div style="font-weight:700;color:#1abc9c;">Thanh toán QR Banking (SePay)</div>
                         <div style="font-size:13px;color:#666;">Quét mã QR qua app ngân hàng – xác nhận tức thì</div>
-                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BankTransfer -->
+            <div class="payment-option" onclick="selectPayment('BankTransfer', this)">
+                <input type="radio" name="paymentMethod" id="pmBank" value="BankTransfer" style="display:none">
+                <div class="payment-option-inner" id="lbl-BankTransfer" style="
+                    border:2px solid #ddd; border-radius:8px; padding:14px 18px;
+                    display:flex; align-items:center; gap:14px; cursor:pointer;
+                    background:#fff;">
+                    <i class="fas fa-exchange-alt" style="color:#2980b9;font-size:24px;"></i>
+                    <div>
+                        <div style="font-weight:700;color:#2980b9;">Chuyển khoản ngân hàng</div>
+                        <div style="font-size:13px;color:#666;">Chuyển khoản qua số tài khoản</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnSubmit">Đặt hàng ngay</button>
+    </form>
+</div>
+
+<script>
+    // Gọi qua proxy server — token GHN không bị lộ ra client
+    const PROXY = "${pageContext.request.contextPath}/ghn-proxy";
+
+    const provinceSelect = document.getElementById("provinceSelect");
+    const districtSelect = document.getElementById("districtSelect");
+    const wardSelect     = document.getElementById("wardSelect");
+    const provinceHint   = document.getElementById("provinceHint");
+    const districtHint   = document.getElementById("districtHint");
+    const wardHint       = document.getElementById("wardHint");
+
+    // ---- Tải danh sách tỉnh/thành phố ----
+    async function loadProvinces() {
+        provinceHint.textContent = "Đang tải...";
+        try {
+            const res  = await fetch(PROXY + "?type=province");
+            const json = await res.json();
+            if (json.code === 200 && json.data) {
+                json.data
+                    .sort((a, b) => a.ProvinceName.localeCompare(b.ProvinceName, "vi"))
+                    .forEach(p => {
+                        const opt = document.createElement("option");
+                        opt.value       = p.ProvinceID;
+                        opt.textContent = p.ProvinceName;
+                        provinceSelect.appendChild(opt);
+                    });
+                provinceHint.textContent = "";
+            } else {
+                provinceHint.textContent = "Không tải được danh sách tỉnh.";
+            }
+        } catch (e) {
+            provinceHint.textContent = "Lỗi kết nối máy chủ.";
+            console.error(e);
+        }
+    }
+
+    // ---- Tải danh sách quận/huyện theo tỉnh ----
+    async function loadDistricts(provinceId) {
+        districtSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+        wardSelect.innerHTML     = '<option value="">-- Chọn phường/xã --</option>';
+        districtSelect.disabled  = true;
+        wardSelect.disabled      = true;
+
+        if (!provinceId) return;
+
+        districtHint.textContent = "Đang tải...";
+        try {
+            const res  = await fetch(PROXY + "?type=district&province_id=" + provinceId);
+            const json = await res.json();
+            if (json.code === 200 && json.data) {
+                json.data
+                    .sort((a, b) => a.DistrictName.localeCompare(b.DistrictName, "vi"))
+                    .forEach(d => {
+                        const opt = document.createElement("option");
+                        opt.value       = d.DistrictID;
+                        opt.textContent = d.DistrictName;
+                        districtSelect.appendChild(opt);
+                    });
+                districtSelect.disabled  = false;
+                districtHint.textContent = "";
+            } else {
+                districtHint.textContent = "Không tải được danh sách quận/huyện.";
+            }
+        } catch (e) {
+            districtHint.textContent = "Lỗi kết nối máy chủ.";
+            console.error(e);
+        }
+    }
+
+    async function loadWards(districtId) {
+        wardSelect.innerHTML = '<option value="">-- Chọn phường/xã --</option>';
+        wardSelect.disabled  = true;
+
+        if (!districtId) return;
+
+        wardHint.textContent = "Đang tải...";
+        try {
+            const res = await fetch(PROXY + "?type=ward&district_id=" + districtId);
+            const json = await res.json();
+            if (json.code === 200 && json.data) {
+                json.data
+                    .sort((a, b) => a.WardName.localeCompare(b.WardName, "vi"))
+                    .forEach(w => {
+                        const opt = document.createElement("option");
+                        opt.value = w.WardCode;
+                        opt.textContent = w.WardName;
+                        wardSelect.appendChild(opt);
+                    });
+                wardSelect.disabled  = false;
+                wardHint.textContent = "";
+            } else {
+                wardHint.textContent = "Không tải được danh sách phường/xã.";
+            }
+        } catch (e) {
+            wardHint.textContent = "Lỗi kết nối máy chủ.";
+            console.error(e);
+        }
+    }
+
+    provinceSelect.addEventListener("change", () => loadDistricts(provinceSelect.value));
+    districtSelect.addEventListener("change", () => loadWards(districtSelect.value));
+
+    function selectPayment(value, el) {
+        document.querySelectorAll('.payment-option-inner').forEach(function (d) {
+            d.style.border = '2px solid #ddd';
+            d.style.background = '#fff';
+        });
+
+        const inner = document.getElementById('lbl-' + value);
+        if (inner) {
+            const colors = {
+                COD: '#2ecc71',
+                SEPAY: '#1abc9c',
+                BankTransfer: '#2980b9'
+            };
+            const bgs = {
+                COD: '#f0fdf4',
+                SEPAY: '#f0fdfb',
+                BankTransfer: '#eff7ff'
+            };
+            inner.style.border = '2px solid ' + (colors[value] || '#999');
+            inner.style.background = bgs[value] || '#fff';
+        }
+
+        const radio = document.getElementById('pm' + value);
+        if (radio) radio.checked = true;
+
+        const form = document.getElementById('checkoutForm');
+        if (value === 'SEPAY') {
+            form.action = 'payment/sepay';
+        } else {
+            form.action = 'checkout';
+        }
+    }
+
+    document.getElementById("checkoutForm").addEventListener("submit", function (e) {
+        if (!districtSelect.value || !wardSelect.value) {
+            e.preventDefault();
+            alert("Vui lòng chọn đầy đủ Quận/Huyện và Phường/Xã.");
+        }
+    });
+
+    loadProvinces();
+    selectPayment('COD', null);
+</script>
+
+</body>
+</html>
