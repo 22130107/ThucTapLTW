@@ -269,4 +269,143 @@
 </div>
 
 <div id="toast"></div>
-
+
+<script>
+  const ORDER_ID = ${not empty orderId ? orderId : 0};
+  const EXPIRY_MINS = ${not empty expiryMins ? expiryMins : 15};
+  const CTX = '${pageContext.request.contextPath}';
+  const STATUS_URL = CTX + '/payment/sepay/status?orderId=' + ORDER_ID;
+  const SUCCESS_URL = CTX + '/payment/sepay/success?orderId=' + ORDER_ID;
+  const POLL_INTERVAL = 3000;
+  const MAX_POLLS = Math.ceil((EXPIRY_MINS * 60 * 1000) / POLL_INTERVAL);
+
+  const debugMode = new URLSearchParams(location.search).get('debug') === '1';
+  const debugPanel = document.getElementById('debugPanel');
+  if (debugMode) debugPanel.style.display = 'block';
+
+  function dbg(msg) {
+    if (!debugMode) return;
+    const d = new Date().toLocaleTimeString('vi');
+    debugPanel.innerHTML += '<div>[' + d + '] ' + msg + '</div>';
+    debugPanel.scrollTop = debugPanel.scrollHeight;
+  }
+
+  let pollCount = 0;
+  let pollTimer = null;
+  let countdownTimer = null;
+  const expiryTs = Date.now() + EXPIRY_MINS * 60 * 1000;
+
+  function updateCountdown() {
+    const left = Math.max(0, expiryTs - Date.now());
+    const m = Math.floor(left / 60000);
+    const s = Math.floor((left % 60000) / 1000);
+    document.getElementById('timer').textContent =
+            left > 0
+                    ? 'Hết hạn sau: ' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0')
+                    : 'Phiên thanh toán đã hết hạn';
+    if (left === 0) clearInterval(countdownTimer);
+  }
+  countdownTimer = setInterval(updateCountdown, 1000);
+  updateCountdown();
+
+  async function poll() {
+    pollCount++;
+    dbg('Poll #' + pollCount + ' → ' + STATUS_URL);
+
+    let data;
+    try {
+      const res = await fetch(STATUS_URL, {
+        method: 'GET',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+
+      dbg('HTTP ' + res.status + ' ' + res.statusText);
+
+      if (!res.ok) {
+        dbg('Non-OK response – skipping');
+        return;
+      }
+
+      const text = await res.text();
+      dbg('Body: ' + text);
+
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        dbg('JSON parse error: ' + e);
+        return;
+      }
+
+    } catch (err) {
+      dbg('Fetch error: ' + err);
+      return;
+    }
+
+    const status = data.status;
+    dbg('Status = ' + status);
+
+    if (status === 'SUCCESS') {
+      clearPoll();
+      showSuccess();
+      return;
+    }
+    if (status === 'CANCELLED') {
+      clearPoll();
+      showCancelled();
+      return;
+    }
+    if (status === 'UNAUTHORIZED') {
+      dbg('UNAUTHORIZED – session may have expired');
+      document.getElementById('statusText').textContent = 'Phiên đăng nhập hết hạn – vui lòng làm mới trang';
+      return;
+    }
+
+    if (pollCount >= MAX_POLLS) {
+      clearPoll();
+      document.getElementById('timer').textContent = '⚠️ Phiên thanh toán đã hết hạn';
+      dbg('Max polls reached – stopped');
+    }
+  }
+
+  function clearPoll() {
+    if (pollTimer) clearInterval(pollTimer);
+    if (countdownTimer) clearInterval(countdownTimer);
+  }
+
+  function showSuccess() {
+    const bar = document.getElementById('statusBar');
+    bar.classList.remove('pending');
+    bar.classList.add('success');
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('statusText').innerHTML = '<i class="fas fa-check-circle"></i> Thanh toán thành công! Đang chuyển hướng...';
+    document.getElementById('timer').textContent = '';
+    dbg('SUCCESS – redirecting to ' + SUCCESS_URL);
+    setTimeout(() => { window.location.href = SUCCESS_URL; }, 1500);
+  }
+
+  function showCancelled() {
+    const bar = document.getElementById('statusBar');
+    bar.classList.remove('pending');
+    bar.classList.add('cancelled');
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('statusText').innerHTML = '<i class="fas fa-times-circle"></i> Đơn hàng đã bị huỷ';
+  }
+
+  poll();
+  pollTimer = setInterval(poll, POLL_INTERVAL);
+  function copyContent() {
+    const txt = document.getElementById('transferContent').textContent.trim();
+    navigator.clipboard.writeText(txt).then(() => showToast('Đã sao chép: ' + txt));
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>
