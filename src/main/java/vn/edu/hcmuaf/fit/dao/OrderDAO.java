@@ -12,19 +12,20 @@ import java.util.List;
 import java.util.Map;
 
 public class OrderDAO {
-    private static OrderDAO instance;
-
-    public OrderDAO() {
-    }
+    private static volatile OrderDAO instance;
 
     public static OrderDAO getInstance() {
         if (instance == null) {
-            instance = new OrderDAO();
+            synchronized (OrderDAO.class) {
+                if (instance == null) {
+                    instance = new OrderDAO();
+                }
+            }
         }
         return instance;
     }
 
-    public int createOrder(Order order, Cart cart) {
+    public int createOrder(Order order, Cart cart, String recipientPhone, int toDistrictId, String toWardCode) {
         int orderId = -1;
         try (Connection conn = DBConnect.get()) {
             if (conn == null) return -1;
@@ -59,6 +60,15 @@ public class OrderDAO {
                         psDetail.addBatch();
                     }
                     psDetail.executeBatch();
+                }
+
+                String sqlShipping = "INSERT INTO order_shipping (OrderID, RecipientPhone, ToDistrictId, ToWardCode) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement psShipping = conn.prepareStatement(sqlShipping)) {
+                    psShipping.setInt(1, orderId);
+                    psShipping.setString(2, recipientPhone);
+                    psShipping.setInt(3, toDistrictId);
+                    psShipping.setString(4, toWardCode);
+                    psShipping.executeUpdate();
                 }
 
                 conn.commit();
