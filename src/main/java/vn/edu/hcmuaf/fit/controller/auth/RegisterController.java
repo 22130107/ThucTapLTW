@@ -43,6 +43,9 @@ public class RegisterController extends HttpServlet {
         }
 
         UserService.getInstance().register(username, password, email);
-        response.sendRedirect("login");
+
+        HttpSession session = request.getSession();
+        session.setAttribute("registerSuccess", "Đăng ký tài khoản thành công! Vui lòng đăng nhập để tiếp tục.");
+        response.sendRedirect(request.getContextPath() + "/login");
     }
 }
