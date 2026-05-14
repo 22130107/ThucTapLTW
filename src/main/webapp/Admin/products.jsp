@@ -8,6 +8,7 @@
                 <meta charset="utf-8" />
                 <title>MedHome Admin — Sản phẩm</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/Admin/admin.css?v=2" />
             </head>
 
@@ -23,8 +24,8 @@
                         <button type="submit">Tìm</button>
                     </form>
                     <nav class="header-right">
-                        <a class="topbtn" href="#" title="Thông báo">🔔</a>
-                        <a class="topbtn" href="#" title="Tài khoản">👤</a>
+                        <a class="topbtn" href="#" title="Thông báo"><i class="fa-solid fa-bell"></i></a>
+                        <a class="topbtn" href="#" title="Tài khoản"><i class="fa-solid fa-user"></i></a>
                     </nav>
                 </header>
 
@@ -33,13 +34,12 @@
 
                     <!-- SIDEBAR -->
                     <aside id="sidebar" class="sidebar" aria-hidden="false">
-                        <div class="sidebar-title">Quản trị</div>
                         <nav class="menu">
-                            <a class="menu-item" href="overview">🏠 Tổng quan</a>
-                            <a class="menu-item" href="accounts">👥 Tài khoản</a>
-                            <a class="menu-item active" href="products">🧰 Sản phẩm</a>
-                            <a class="menu-item" href="orders">🧾 Đơn hàng</a>
-                            <a class="menu-item" href="appointments">💹 Lịch Khám</a>
+                            <a class="menu-item" href="overview">Tổng quan</a>
+                            <a class="menu-item" href="accounts">Tài khoản</a>
+                            <a class="menu-item active" href="products">Sản phẩm</a>
+                            <a class="menu-item" href="orders">Đơn hàng</a>
+                            <a class="menu-item" href="appointments">Lịch khám</a>
                         </nav>
                     </aside>
 
@@ -47,6 +47,13 @@
                     <main class="content">
 
                         <h2>Quản lý sản phẩm</h2>
+
+                        <c:if test="${not empty sessionScope.errorMsg}">
+                            <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 12px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> <strong>Lỗi:</strong> ${sessionScope.errorMsg}
+                            </div>
+                            <c:remove var="errorMsg" scope="session" />
+                        </c:if>
 
                         <!-- BỘ LỌC -->
                         <section class="card" style="padding:12px; margin:10px 0 14px;">
@@ -88,7 +95,7 @@
 
                         <!-- ACTIONS -->
                         <div class="actions">
-                            <a class="btn" href="#modal-add">+ Thêm sản phẩm</a>
+                            <a class="btn" href="#modal-add">Thêm sản phẩm</a>
                             <a class="btn btn-ghost" href="#modal-edit" id="btn-edit">Sửa</a>
                             <a class="btn btn-danger" href="#modal-delete" id="btn-delete">Xóa</a>
                         </div>
@@ -143,8 +150,6 @@
                                 </table>
                             </div>
                         </section>
-
-                        <footer class="foot">© 2025 MedHome Admin</footer>
 
                     </main>
 
