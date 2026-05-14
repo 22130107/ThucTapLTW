@@ -53,6 +53,7 @@ public class CheckoutServlet extends HttpServlet {
         String toDistrictIdParam = request.getParameter("toDistrictId");
         String toWardCode        = request.getParameter("toWardCode");
         String paymentMethod     = request.getParameter("paymentMethod");
+        String promoCode         = request.getParameter("promoCode");
 
         System.out.println("[Checkout] recipientName="   + recipientName);
         System.out.println("[Checkout] recipientPhone="  + recipientPhone);
@@ -60,6 +61,7 @@ public class CheckoutServlet extends HttpServlet {
         System.out.println("[Checkout] toDistrictId="    + toDistrictIdParam);
         System.out.println("[Checkout] toWardCode="      + toWardCode);
         System.out.println("[Checkout] paymentMethod="   + paymentMethod);
+        System.out.println("[Checkout] promoCode="       + promoCode);
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("auth");
@@ -89,7 +91,8 @@ public class CheckoutServlet extends HttpServlet {
 
         boolean success = OrderService.getInstance().placeOrder(
                 customerId, recipientName, recipientPhone,
-                shippingAddress, toDistrictId, toWardCode, paymentMethod);
+                shippingAddress, toDistrictId, toWardCode, paymentMethod,
+                promoCode != null ? promoCode.trim().toUpperCase() : null);
 
         System.out.println("[Checkout] placeOrder result=" + success);
 
