@@ -16,6 +16,7 @@ public class Product implements Serializable {
     private int sold;
     private String description;
     private int stock;
+    private int categoryId;
 
     public Product() {
     }
@@ -137,5 +138,13 @@ public class Product implements Serializable {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 }

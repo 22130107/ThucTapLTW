@@ -39,7 +39,6 @@
                             <a class="menu-item" href="accounts">👥 Tài khoản</a>
                             <a class="menu-item active" href="products">🧰 Sản phẩm</a>
                             <a class="menu-item" href="orders">🧾 Đơn hàng</a>
-                            <a class="menu-item" href="appointments">💹 Lịch Khám</a>
                         </nav>
                     </aside>
 
@@ -61,9 +60,9 @@
                                     Thương hiệu
                                     <select class="input" name="brand">
                                         <option value="">Tất cả</option>
-                                        <option ${msgBrand=='Omron' ? 'selected' : '' }>Omron</option>
-                                        <option ${msgBrand=='Microlife' ? 'selected' : '' }>Microlife</option>
-                                        <option ${msgBrand=='Khác' ? 'selected' : '' }>Khác</option>
+                                        <c:forEach items="${brands}" var="b">
+                                            <option value="${b}" ${msgBrand==b ? 'selected' : ''}>${b}</option>
+                                        </c:forEach>
                                     </select>
                                 </label>
                                 <label>
@@ -93,6 +92,16 @@
                             <a class="btn btn-danger" href="#modal-delete" id="btn-delete">Xóa</a>
                         </div>
 
+                        <!-- Thông báo -->
+                        <c:if test="${not empty sessionScope.success}">
+                            <div style="padding:10px 16px;margin-bottom:12px;border-radius:6px;background:#d4edda;color:#155724;border:1px solid #c3e6cb;">${sessionScope.success}</div>
+                            <c:remove var="success" scope="session" />
+                        </c:if>
+                        <c:if test="${not empty sessionScope.error}">
+                            <div style="padding:10px 16px;margin-bottom:12px;border-radius:6px;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;">${sessionScope.error}</div>
+                            <c:remove var="error" scope="session" />
+                        </c:if>
+
                         <!-- BẢNG SẢN PHẨM -->
                         <section class="card">
                             <div class="table-wrap">
@@ -113,7 +122,7 @@
                                         <c:forEach items="${listP}" var="p">
                                             <tr data-id="${p.id}" data-name="${p.name}" data-img="${p.img}"
                                                 data-brand="${p.brand}" data-price="${p.price}" data-stock="${p.stock}"
-                                                data-description="${p.description}">
+                                                data-description="${p.description}" data-category="${p.categoryId}">
                                                 <td><input type="checkbox" aria-label="Chọn" /></td>
                                                 <td>SP${p.id}</td>
                                                 <td>
@@ -177,6 +186,14 @@
                             <label>Thương hiệu
                                 <input class="input" name="brand" />
                             </label>
+                            <label>Danh mục
+                                <select class="input" name="categoryId">
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <c:forEach items="${categories}" var="cat">
+                                        <option value="${cat.categoryID}">${cat.categoryName}</option>
+                                    </c:forEach>
+                                </select>
+                            </label>
                             <label>Giá (₫)
                                 <input class="input" type="number" name="price" min="0" step="1000" required />
                             </label>
@@ -219,6 +236,14 @@
                             </label>
                             <label>Thương hiệu
                                 <input class="input" name="brand" id="edit-brand" />
+                            </label>
+                            <label>Danh mục
+                                <select class="input" name="categoryId" id="edit-category">
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <c:forEach items="${categories}" var="cat">
+                                        <option value="${cat.categoryID}">${cat.categoryName}</option>
+                                    </c:forEach>
+                                </select>
                             </label>
                             <label>Giá (₫)
                                 <input class="input" type="number" name="price" id="edit-price" min="0" step="1000"
@@ -359,6 +384,13 @@
                         if (data.brand) document.getElementById('edit-brand').value = data.brand;
                         if (data.price) document.getElementById('edit-price').value = data.price;
                         if (data.stock) document.getElementById('edit-stock').value = data.stock;
+
+                        // Set category
+                        if (data.category) {
+                            document.getElementById('edit-category').value = data.category;
+                        } else {
+                            document.getElementById('edit-category').value = '';
+                        }
 
                         // Set CKEditor data
                         if (data.description) {

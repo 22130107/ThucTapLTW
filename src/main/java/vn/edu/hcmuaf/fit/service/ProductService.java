@@ -318,9 +318,9 @@ public class ProductService {
         }
 
         if (status != null && !status.isEmpty()) {
-            if ("CÃƒÂ²n hÃƒÂ ng".equals(status)) {
+            if ("Còn hàng".equals(status)) {
                 sql.append("AND d.StockQuantity > 0 ");
-            } else if ("HÃ¡ÂºÂ¿t hÃƒÂ ng".equals(status)) {
+            } else if ("Hết hàng".equals(status)) {
                 sql.append("AND d.StockQuantity = 0 ");
             }
         }
@@ -390,15 +390,47 @@ public class ProductService {
         return list;
     }
 
-    public boolean addProduct(Product p) {
-        Connection conn = DBConnect.get();
-        if (conn == null)
-            return false;
+    public List<String> getAllBrands() {
+        List<String> brands = new ArrayList<>();
+        String sql = "SELECT DISTINCT Brand FROM products WHERE Brand IS NOT NULL AND Brand != '' ORDER BY Brand";
+        try (Connection conn = DBConnect.get();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (conn == null) return brands;
+            while (rs.next()) {
+                brands.add(rs.getString("Brand"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return brands;
+    }
 
+    public int getProductCategoryId(int productId) {
+        String sql = "SELECT CategoryID FROM product_categories WHERE ProductID = ? LIMIT 1";
+        try (Connection conn = DBConnect.get();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (conn == null) return 0;
+            ps.setInt(1, productId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("CategoryID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public boolean addProduct(Product p) {
         String sql1 = "INSERT INTO products (ProductName, Brand, ImageURL, CreatedAt) VALUES (?, ?, ?, NOW())";
         String sql2 = "INSERT INTO productdetails (ProductID, Price, StockQuantity, DetailDescription) VALUES (?, ?, ?, ?)";
+        String sql3 = "INSERT INTO product_categories (ProductID, CategoryID) VALUES (?, ?)";
 
+        Connection conn = null;
         try {
+            conn = DBConnect.get();
+            if (conn == null) return false;
             conn.setAutoCommit(false);
 
             PreparedStatement ps1 = conn.prepareStatement(sql1, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -417,8 +449,14 @@ public class ProductService {
                     ps2.setDouble(2, p.getPrice());
                     ps2.setInt(3, p.getStock());
                     ps2.setString(4, p.getDescription());
-
                     ps2.executeUpdate();
+
+                    if (p.getCategoryId() > 0) {
+                        PreparedStatement ps3 = conn.prepareStatement(sql3);
+                        ps3.setInt(1, productId);
+                        ps3.setInt(2, p.getCategoryId());
+                        ps3.executeUpdate();
+                    }
 
                     conn.commit();
                     return true;
@@ -427,30 +465,25 @@ public class ProductService {
             conn.rollback();
         } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
         } finally {
-            try {
-                conn.setAutoCommit(true);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
         return false;
     }
 
     public boolean updateProduct(Product p) {
-        Connection conn = DBConnect.get();
-        if (conn == null)
-            return false;
-
         String sql1 = "UPDATE products SET ProductName=?, Brand=?, ImageURL=? WHERE ProductID=?";
         String sql2 = "UPDATE productdetails SET Price=?, StockQuantity=?, DetailDescription=? WHERE ProductID=?";
+        String sql3Del = "DELETE FROM product_categories WHERE ProductID=?";
+        String sql3Ins = "INSERT INTO product_categories (ProductID, CategoryID) VALUES (?, ?)";
 
+        Connection conn = null;
         try {
+            conn = DBConnect.get();
+            if (conn == null) return false;
             conn.setAutoCommit(false);
 
             PreparedStatement ps1 = conn.prepareStatement(sql1);
@@ -458,7 +491,6 @@ public class ProductService {
             ps1.setString(2, p.getBrand());
             ps1.setString(3, p.getImg());
             ps1.setInt(4, p.getId());
-
             ps1.executeUpdate();
 
             PreparedStatement ps2 = conn.prepareStatement(sql2);
@@ -466,37 +498,37 @@ public class ProductService {
             ps2.setInt(2, p.getStock());
             ps2.setString(3, p.getDescription());
             ps2.setInt(4, p.getId());
-
             ps2.executeUpdate();
+
+            PreparedStatement ps3Del = conn.prepareStatement(sql3Del);
+            ps3Del.setInt(1, p.getId());
+            ps3Del.executeUpdate();
+
+            if (p.getCategoryId() > 0) {
+                PreparedStatement ps3Ins = conn.prepareStatement(sql3Ins);
+                ps3Ins.setInt(1, p.getId());
+                ps3Ins.setInt(2, p.getCategoryId());
+                ps3Ins.executeUpdate();
+            }
 
             conn.commit();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
         } finally {
-            try {
-                conn.setAutoCommit(true);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
         return false;
     }
 
     public boolean deleteProduct(int id) {
-        Connection conn = DBConnect.get();
-        if (conn == null)
-            return false;
-
         String sql = "UPDATE productdetails SET StockQuantity = -1 WHERE ProductID = ?";
-
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnect.get();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (conn == null) return false;
             ps.setInt(1, id);
             int affected = ps.executeUpdate();
             return affected > 0;
@@ -508,10 +540,10 @@ public class ProductService {
 
     public int countTotalProducts() {
         String sql = "SELECT COUNT(*) FROM products";
-        Connection conn = DBConnect.get();
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        try (Connection conn = DBConnect.get();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (conn == null) return 0;
             if (rs.next())
                 return rs.getInt(1);
         } catch (SQLException e) {
