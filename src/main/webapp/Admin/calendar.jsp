@@ -25,8 +25,8 @@
                         <button type="submit">Tìm</button>
                     </form>
                     <nav class="header-right">
-                        <a class="topbtn" href="#" title="Thông báo">🔔</a>
-                        <a class="topbtn" href="#" title="Tài khoản">👤</a>
+                        <a class="topbtn" href="#" title="Thông báo"><i class="fa-solid fa-bell"></i></a>
+                        <a class="topbtn" href="#" title="Tài khoản"><i class="fa-solid fa-user"></i></a>
                     </nav>
 
                 </header>
@@ -39,11 +39,11 @@
 
                         <div class="sidebar-title">Quản trị</div>
                         <nav class="menu">
-                            <a class="menu-item" href="overview">🏠 Tổng quan</a>
-                            <a class="menu-item" href="accounts">👥 Tài khoản</a>
-                            <a class="menu-item" href="products">🧰 Sản phẩm</a>
-                            <a class="menu-item" href="orders">🧾 Đơn hàng</a>
-                            <a class="menu-item active" href="appointments">💹 Lịch Khám</a>
+                            <a class="menu-item" href="overview">Tổng quan</a>
+                            <a class="menu-item" href="accounts">Tài khoản</a>
+                            <a class="menu-item" href="products">Sản phẩm</a>
+                            <a class="menu-item" href="orders">Đơn hàng</a>
+                            <a class="menu-item active" href="appointments">Lịch khám</a>
                         </nav>
 
 
@@ -127,7 +127,7 @@
                                     <div class="search-box"
                                         style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 0 10px; height: 38px; margin-top: 22px;">
                                         <input type="text" name="q" value="${msgKeyword}"
-                                            placeholder="🔍 Tên, SĐT, Mã..."
+                                            placeholder="Tên, SĐT, Mã..."
                                             style="border: none; outline: none; flex: 1; font-size: 14px;">
                                         <button type="submit"
                                             style="background: none; border: none; color: #666; cursor: pointer;">
@@ -197,7 +197,6 @@
                                                 <!-- <td>
                                         <div class="doctor-name">--</div>
                                     </td> -->
-                                                <td>
                                                 <td>
                                                     <c:choose>
                                                         <c:when
