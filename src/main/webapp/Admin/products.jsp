@@ -42,6 +42,7 @@
                             <a class="menu-item" href="overview">Tổng quan</a>
                             <a class="menu-item" href="accounts">Tài khoản</a>
                             <a class="menu-item active" href="products">Sản phẩm</a>
+                            <a class="menu-item" href="categories">Danh mục</a>
                             <a class="menu-item" href="promocodes">Khuyến mãi</a>
                             <a class="menu-item" href="orders">Đơn hàng</a>
                         </nav>

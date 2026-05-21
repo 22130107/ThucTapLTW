@@ -1,6 +1,8 @@
 package vn.edu.hcmuaf.fit.controller.admin;
 
+import vn.edu.hcmuaf.fit.model.Category;
 import vn.edu.hcmuaf.fit.model.PromoCode;
+import vn.edu.hcmuaf.fit.service.CategoryService;
 import vn.edu.hcmuaf.fit.service.PromoCodeService;
 
 import jakarta.servlet.ServletException;
@@ -34,6 +36,7 @@ public class AdminPromoController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("pageSize", size);
         request.setAttribute("totalItems", total);
+        request.setAttribute("categories", CategoryService.getInstance().getAll());
         request.getRequestDispatcher("/Admin/promocodes.jsp").forward(request, response);
     }
 

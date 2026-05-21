@@ -32,6 +32,7 @@
             <a class="menu-item" href="overview">Tổng quan</a>
             <a class="menu-item" href="accounts">Tài khoản</a>
             <a class="menu-item" href="products">Sản phẩm</a>
+            <a class="menu-item" href="categories">Danh mục</a>
             <a class="menu-item active" href="promocodes">Khuyến mãi</a>
             <a class="menu-item" href="orders">Đơn hàng</a>
         </nav>
@@ -67,6 +68,7 @@
                     <th>Amount</th>
                     <th>Used/Limit</th>
                     <th>Active</th>
+                    <th>Áp dụng</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -87,8 +89,19 @@
                             <span class="badge ${p.active ? 'ok' : 'secondary'}">${p.active ? 'Bật' : 'Tắt'}</span>
                         </td>
                         <td>
+                            <c:choose>
+                                <c:when test="${p.appliesTo eq 'all'}">Tất cả</c:when>
+                                <c:when test="${p.appliesTo eq 'category'}">
+                                    <c:forEach items="${categories}" var="cat">
+                                        <c:if test="${cat.categoryID eq p.appliesToId}">${cat.categoryName}</c:if>
+                                    </c:forEach>
+                                </c:when>
+                                <c:when test="${p.appliesTo eq 'product'}">SP${p.appliesToId}</c:when>
+                            </c:choose>
+                        </td>
+                        <td>
                             <button class="btn btn-ghost" type="button"
-                                onclick="openEdit(${p.id},'${p.code}','${p.type}',${p.amount},${p.minOrderValue},'${p.startAt}','${p.endAt}',${p.usageLimit},${p.active},'${p.appliesTo}')">
+                                onclick="openEdit(${p.id},'${p.code}','${p.type}',${p.amount},${p.minOrderValue},'${p.startAt}','${p.endAt}',${p.usageLimit},${p.active},'${p.appliesTo}',${p.appliesToId != null ? p.appliesToId : 'null'})">
                                 <i class="fa-solid fa-pen"></i> Sửa
                             </button>
                             <form action="promocodes" method="post" style="display:inline">
@@ -140,15 +153,25 @@
                     <input class="input" name="usageLimit" type="number" min="0" value="0"/>
                 </label>
                 <label>Áp dụng cho
-                    <select name="appliesTo" class="input">
+                    <select name="appliesTo" class="input" id="add-appliesTo" onchange="toggleAppliesTo('add')">
                         <option value="all">Tất cả</option>
                         <option value="category">Danh mục</option>
                         <option value="product">Sản phẩm</option>
                     </select>
                 </label>
-                <label>ID danh mục / sản phẩm (nếu cần)
-                    <input class="input" name="appliesToId" type="number" placeholder="Để trống nếu áp dụng tất cả"/>
+                <label id="add-category-wrap" style="display:none;">Danh mục
+                    <select class="input" id="add-category" onchange="document.getElementById('add-appliesToId').value=this.value">
+                        <option value="">-- Chọn danh mục --</option>
+                        <c:forEach items="${categories}" var="cat">
+                            <option value="${cat.categoryID}">${cat.categoryName}</option>
+                        </c:forEach>
+                    </select>
                 </label>
+                <label id="add-product-wrap" style="display:none;">ID sản phẩm
+                    <input class="input" type="number" placeholder="Nhập ID sản phẩm" id="add-product-id"
+                        oninput="document.getElementById('add-appliesToId').value=this.value"/>
+                </label>
+                <input type="hidden" name="appliesToId" id="add-appliesToId" value="" />
                 <label style="flex-direction:row; align-items:center; gap:8px;">
                     <input type="checkbox" name="active" checked /> Kích hoạt ngay
                 </label>
@@ -194,12 +217,25 @@
                     <input class="input" name="usageLimit" id="edit-usageLimit" type="number" min="0"/>
                 </label>
                 <label>Áp dụng cho
-                    <select name="appliesTo" class="input" id="edit-appliesTo">
+                    <select name="appliesTo" class="input" id="edit-appliesTo" onchange="toggleAppliesTo('edit')">
                         <option value="all">Tất cả</option>
                         <option value="category">Danh mục</option>
                         <option value="product">Sản phẩm</option>
                     </select>
                 </label>
+                <label id="edit-category-wrap" style="display:none;">Danh mục
+                    <select class="input" id="edit-category" onchange="document.getElementById('edit-appliesToId').value=this.value">
+                        <option value="">-- Chọn danh mục --</option>
+                        <c:forEach items="${categories}" var="cat">
+                            <option value="${cat.categoryID}">${cat.categoryName}</option>
+                        </c:forEach>
+                    </select>
+                </label>
+                <label id="edit-product-wrap" style="display:none;">ID sản phẩm
+                    <input class="input" type="number" placeholder="Nhập ID sản phẩm" id="edit-product-id"
+                        oninput="document.getElementById('edit-appliesToId').value=this.value"/>
+                </label>
+                <input type="hidden" name="appliesToId" id="edit-appliesToId" value="" />
                 <label style="flex-direction:row; align-items:center; gap:8px;">
                     <input type="checkbox" name="active" id="edit-active" /> Kích hoạt
                 </label>
@@ -213,7 +249,14 @@
 
     <script src="${pageContext.request.contextPath}/Admin/app.js"></script>
     <script>
-        function openEdit(id, code, type, amount, minOrder, startAt, endAt, usageLimit, active, appliesTo) {
+        function toggleAppliesTo(prefix) {
+            const val = document.getElementById(prefix + '-appliesTo').value;
+            document.getElementById(prefix + '-category-wrap').style.display = val === 'category' ? '' : 'none';
+            document.getElementById(prefix + '-product-wrap').style.display = val === 'product' ? '' : 'none';
+            if (val === 'all') document.getElementById(prefix + '-appliesToId').value = '';
+        }
+
+        function openEdit(id, code, type, amount, minOrder, startAt, endAt, usageLimit, active, appliesTo, appliesToId) {
             document.getElementById('edit-id').value        = id;
             document.getElementById('edit-code').value      = code;
             document.getElementById('edit-type').value      = type;
@@ -223,7 +266,15 @@
             document.getElementById('edit-active').checked  = (active === true || active === 'true');
             document.getElementById('edit-appliesTo').value = appliesTo;
 
-            // Format dates for datetime-local input (yyyy-MM-ddTHH:mm)
+            toggleAppliesTo('edit');
+            document.getElementById('edit-appliesToId').value = appliesToId || '';
+
+            if (appliesTo === 'category' && appliesToId) {
+                document.getElementById('edit-category').value = appliesToId;
+            } else if (appliesTo === 'product' && appliesToId) {
+                document.getElementById('edit-product-id').value = appliesToId;
+            }
+
             function fmtDate(d) {
                 if (!d || d === 'null') return '';
                 try {
