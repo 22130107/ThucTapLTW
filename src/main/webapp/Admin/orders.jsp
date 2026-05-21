@@ -41,7 +41,6 @@
             <a class="menu-item" href="accounts">👥 Tài khoản</a>
             <a class="menu-item" href="products">🧰 Sản phẩm</a>
             <a class="menu-item active" href="orders">🧾 Đơn hàng</a>
-            <a class="menu-item" href="appointments">💹 Lịch Khám</a>
         </nav>
     </aside>
 

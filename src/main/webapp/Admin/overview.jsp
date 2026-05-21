@@ -43,8 +43,7 @@
                         <a class="menu-item active" href="overview">🏠 Tổng quan</a>
                         <a class="menu-item" href="accounts">👥 Tài khoản</a>
                         <a class="menu-item" href="products">🧰 Sản phẩm</a>
-                        <a class="menu-item" href="orders">🧾 Đơn hàng</a>
-                        <a class="menu-item" href="appointments">💹 Lịch Khám</a>
+                            <a class="menu-item" href="orders">🧾 Đơn hàng</a>
                     </nav>
                 </aside>
 
@@ -70,12 +69,6 @@
 
 
                         <div class="stat-card">
-                            <h3>📅 Lịch khám hôm nay</h3>
-                            <p class="value">${appointmentsToday}</p>
-                            <p class="sub">Lịch hẹn trong ngày</p>
-                        </div>
-
-                        <div class="stat-card">
                             <h3>👥 Tài khoản</h3>
                             <p class="value">${totalAccounts}</p>
                             <p class="sub">Thành viên đăng ký</p>
@@ -90,7 +83,6 @@
 
                             <a class="btn" href="orders">+ Quản lý đơn hàng</a>
                             <a class="btn btn-ghost" href="products">Quản lý sản phẩm</a>
-                            <a class="btn btn-ghost" href="appointments">Xem lịch khám</a>
 
                         </div>
 
