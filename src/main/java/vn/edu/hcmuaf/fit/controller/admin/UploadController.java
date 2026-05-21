@@ -45,7 +45,6 @@ public class UploadController extends HttpServlet {
             Part filePart = req.getPart("upload");
 
             if (filePart == null) {
-
                 for (Part part : req.getParts()) {
                     if (part.getSubmittedFileName() != null && !part.getSubmittedFileName().isEmpty()) {
                         filePart = part;
@@ -55,16 +54,41 @@ public class UploadController extends HttpServlet {
             }
 
             if (filePart != null) {
+                long maxSize = 5L * 1024 * 1024; // 5 MB
+                if (filePart.getSize() > maxSize) {
+                    sendErrorResponse(resp, "File quá lớn. Kích thước tối đa 5MB.");
+                    return;
+                }
+
                 String originalFileName = filePart.getSubmittedFileName();
+                if (originalFileName == null || originalFileName.trim().isEmpty()) {
+                    sendErrorResponse(resp, "Tên file không hợp lệ.");
+                    return;
+                }
+
+                // Sanitize filename
+                originalFileName = Paths.get(originalFileName).getFileName().toString();
+
                 String fileExtension = "";
                 int i = originalFileName.lastIndexOf('.');
                 if (i > 0) {
-                    fileExtension = originalFileName.substring(i);
+                    fileExtension = originalFileName.substring(i).toLowerCase();
+                }
+
+                // Allowed extensions and mime types
+                java.util.Set<String> allowedExt = java.util.Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp");
+                java.util.Set<String> allowedMime = java.util.Set.of("image/jpeg", "image/png", "image/gif", "image/webp");
+
+                String partContentType = filePart.getContentType();
+                if (!allowedExt.contains(fileExtension) || (partContentType != null && !allowedMime.contains(partContentType))) {
+                    sendErrorResponse(resp, "Loại file không được phép. Chỉ cho phép: jpg, jpeg, png, gif, webp.");
+                    return;
                 }
 
                 String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
                 Path filePath = Paths.get(uploadFilePath, uniqueFileName);
 
+                // Write file
                 Files.copy(filePart.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                 String fileUrl = req.getContextPath() + "/uploads/" + uniqueFileName;

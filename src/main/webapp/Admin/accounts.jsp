@@ -8,6 +8,7 @@
                 <meta charset="utf-8" />
                 <title>MedHome Admin — Tài khoản</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/Admin/admin.css" />
             </head>
 
@@ -25,8 +26,10 @@
                         <button type="submit">Tìm</button>
                     </form>
                     <nav class="header-right">
-                        <a class="topbtn" href="#" title="Thông báo">🔔</a>
-                        <a class="topbtn" href="#" title="Tài khoản">👤</a>
+                        <a class="topbtn" href="#" title="Thông báo"><i class="fa-solid fa-bell"></i></a>
+                        <span class="topbtn" style="cursor: default;">
+                            <i class="fa-solid fa-user"></i> ${auth.username}
+                        </span>
                     </nav>
 
                 </header>
@@ -36,23 +39,39 @@
 
                     <!-- SIDEBAR -->
                     <aside id="sidebar" class="sidebar" aria-hidden="false">
-
                         <div class="sidebar-title">Quản trị</div>
-
                         <nav class="menu">
-                            <a class="menu-item" href="overview">🏠 Tổng quan</a>
-                            <a class="menu-item active" href="accounts">👥 Tài khoản</a>
-                            <a class="menu-item" href="products">🧰 Sản phẩm</a>
-                            <a class="menu-item" href="orders">🧾 Đơn hàng</a>
+                            <a class="menu-item" href="overview">Tổng quan</a>
+                            <a class="menu-item active" href="accounts">Tài khoản</a>
+                            <a class="menu-item" href="products">Sản phẩm</a>
+                            <a class="menu-item" href="promocodes">Khuyến mãi</a>
+                            <a class="menu-item" href="orders">Đơn hàng</a>
                         </nav>
-
-
+                        <div class="sidebar-logout">
+                            <a class="logout-btn" href="${pageContext.request.contextPath}/logout"
+                               onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
+                                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                            </a>
+                        </div>
                     </aside>
 
                     <!-- CONTENT -->
                     <main class="content">
 
                         <h2>Quản lý tài khoản</h2>
+
+                        <c:if test="${not empty sessionScope.errorMsg}">
+                            <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 12px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> <strong>Lỗi:</strong> ${sessionScope.errorMsg}
+                            </div>
+                            <c:remove var="errorMsg" scope="session" />
+                        </c:if>
+                        <c:if test="${not empty sessionScope.successMsg}">
+                            <div style="color: #0f5132; background-color: #d1e7dd; border: 1px solid #badbcc; padding: 12px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-circle-check"></i> <strong>Thành công:</strong> ${sessionScope.successMsg}
+                            </div>
+                            <c:remove var="successMsg" scope="session" />
+                        </c:if>
 
                         <!-- BỘ LỌC -->
                         <section class="card" style="padding:12px; margin: 10px 0 14px;">
@@ -155,8 +174,6 @@
 
                         </section>
 
-                        <footer class="foot">© 2025 MedHome Admin</footer>
-
                     </main>
 
                 </div>
@@ -175,6 +192,7 @@
                         <h3>Sửa tài khoản</h3>
 
                         <form class="form" action="accounts" method="post">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <input type="hidden" name="action" value="update">
                             <input type="hidden" name="id" id="edit-id">
 

@@ -11,6 +11,8 @@ public class Order {
     private String paymentMethod;
     private String recipientName;
     private String shippingAddress;
+    private String promoCode;
+    private double discountAmount;
 
     public Order() {
     }
@@ -91,6 +93,21 @@ public class Order {
         this.shippingAddress = shippingAddress;
     }
 
+    public String getPromoCode() {
+        return promoCode;
+    }
+
+    public void setPromoCode(String promoCode) {
+        this.promoCode = promoCode;
+    }
+
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
 
     public String getStatusVietnamese() {
         if (status == null) return "Không xác định";

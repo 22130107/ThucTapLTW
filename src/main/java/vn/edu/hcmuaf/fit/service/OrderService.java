@@ -8,12 +8,14 @@ import vn.edu.hcmuaf.fit.model.OrderItem;
 import vn.edu.hcmuaf.fit.model.OrderShipping;
 import vn.edu.hcmuaf.fit.model.OrderShippingGhn;
 import vn.edu.hcmuaf.fit.model.Product;
+import vn.edu.hcmuaf.fit.model.PromoCode;
 import vn.edu.hcmuaf.fit.util.GhnClient;
 import vn.edu.hcmuaf.fit.util.GhnConfig;
 import vn.edu.hcmuaf.fit.util.GhnStatusMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.util.Date;
 import java.util.List;
 import vn.edu.hcmuaf.fit.model.Cart;
 import vn.edu.hcmuaf.fit.model.Order;
@@ -29,7 +31,7 @@ public class OrderService {
     }
 
     public boolean placeOrder(int customerId, String recipientName, String recipientPhone, String shippingAddress,
-                              int toDistrictId, String toWardCode, String paymentMethod) {
+                              int toDistrictId, String toWardCode, String paymentMethod, String promoCode) {
         Cart cart = CartService.getInstance().getCart(customerId);
         if (cart == null || cart.getData().isEmpty()) {
             System.out.println("[OrderService] placeOrder failed: cart null or empty for customerId=" + customerId);
@@ -38,14 +40,62 @@ public class OrderService {
 
         Order order = new Order();
         order.setCustomerId(customerId);
-        order.setTotalAmount(cart.getTotalPrice());
         order.setStatus("Pending");
         order.setRecipientName(recipientName);
         order.setShippingAddress(shippingAddress);
         order.setPaymentMethod(paymentMethod);
 
+        double originalTotal = cart.getTotalPrice();
+        double discountAmount = 0;
+
+        // Áp dụng mã khuyến mãi nếu có
+        if (promoCode != null && !promoCode.isEmpty()) {
+            PromoCode promo = PromoCodeService.getInstance().findByCode(promoCode);
+            if (promo != null && promo.isActive()) {
+                // Validate mã khuyến mãi
+                Date now = new Date();
+                boolean isValid = true;
+
+                if (promo.getStartAt() != null && now.before(promo.getStartAt())) {
+                    isValid = false;
+                }
+                if (promo.getEndAt() != null && now.after(promo.getEndAt())) {
+                    isValid = false;
+                }
+                if (promo.getUsageLimit() > 0 && promo.getUsedCount() >= promo.getUsageLimit()) {
+                    isValid = false;
+                }
+                if (originalTotal < promo.getMinOrderValue()) {
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    // Tính giảm giá
+                    if ("percent".equals(promo.getType())) {
+                        discountAmount = originalTotal * (promo.getAmount() / 100.0);
+                    } else {
+                        discountAmount = promo.getAmount();
+                    }
+                    discountAmount = Math.min(discountAmount, originalTotal);
+
+                    order.setPromoCode(promoCode);
+                    order.setDiscountAmount(discountAmount);
+
+                    // Tăng số lần sử dụng
+                    PromoCodeService.getInstance().incrementUsedCount(promo.getId());
+
+                    System.out.println("[OrderService] Applied promo code: " + promoCode + ", discount: " + discountAmount);
+                }
+            }
+        }
+
+        // Tính tổng tiền sau giảm giá
+        double finalTotal = originalTotal - discountAmount;
+        order.setTotalAmount(finalTotal);
+
         System.out.println("[OrderService] Creating order for customerId=" + customerId
-                + " toDistrictId=" + toDistrictId + " toWardCode=" + toWardCode);
+                + " toDistrictId=" + toDistrictId + " toWardCode=" + toWardCode
+                + " originalTotal=" + originalTotal + " discount=" + discountAmount + " finalTotal=" + finalTotal);
 
         int orderId = OrderDAO.getInstance().createOrder(order, cart, recipientPhone, toDistrictId, toWardCode);
         System.out.println("[OrderService] createOrder returned orderId=" + orderId);
@@ -55,6 +105,13 @@ public class OrderService {
             return true;
         }
         return false;
+    }
+
+    // Overload method cũ để tương thích ngược
+    public boolean placeOrder(int customerId, String recipientName, String recipientPhone, String shippingAddress,
+                              int toDistrictId, String toWardCode, String paymentMethod) {
+        return placeOrder(customerId, recipientName, recipientPhone, shippingAddress, 
+                         toDistrictId, toWardCode, paymentMethod, null);
     }
 
     public boolean confirmOrderAndCreateGhn(int orderId) {

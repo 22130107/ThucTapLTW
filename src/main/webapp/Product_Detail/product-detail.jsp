@@ -161,6 +161,9 @@
                         </div>
                     </div>
 
+                    <!-- Phần đánh giá sản phẩm -->
+                    <jsp:include page="/Product_Detail/reviews-section.jsp" />
+
                     <div class="content">
                         <section class="feature-strip">
                             <div class="feature">
