@@ -8,6 +8,7 @@
                 <meta charset="utf-8" />
                 <title>MedHome Admin — Tài khoản</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/Admin/admin.css" />
             </head>
 
@@ -25,8 +26,8 @@
                         <button type="submit">Tìm</button>
                     </form>
                     <nav class="header-right">
-                        <a class="topbtn" href="#" title="Thông báo">🔔</a>
-                        <a class="topbtn" href="#" title="Tài khoản">👤</a>
+                        <a class="topbtn" href="#" title="Thông báo"><i class="fa-solid fa-bell"></i></a>
+                        <a class="topbtn" href="#" title="Tài khoản"><i class="fa-solid fa-user"></i></a>
                     </nav>
 
                 </header>
@@ -40,10 +41,10 @@
                         <div class="sidebar-title">Quản trị</div>
 
                         <nav class="menu">
-                            <a class="menu-item" href="overview">🏠 Tổng quan</a>
-                            <a class="menu-item active" href="accounts">👥 Tài khoản</a>
-                            <a class="menu-item" href="products">🧰 Sản phẩm</a>
-                            <a class="menu-item" href="orders">🧾 Đơn hàng</a>
+                            <a class="menu-item" href="overview">Tổng quan</a>
+                            <a class="menu-item active" href="accounts">Tài khoản</a>
+                            <a class="menu-item" href="products">Sản phẩm</a>
+                            <a class="menu-item" href="orders">Đơn hàng</a>
                         </nav>
 
 
@@ -154,8 +155,6 @@
                             </div>
 
                         </section>
-
-                        <footer class="foot">© 2025 MedHome Admin</footer>
 
                     </main>
 

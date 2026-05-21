@@ -33,7 +33,7 @@ public class ProductService {
 
         StringBuilder sql = new StringBuilder("SELECT p.ProductID, p.ProductName, p.Brand, p.ImageURL, " +
                 "p.Rating, p.ReviewCount, p.Badge, p.IsInstallment, p.SoldQuantity, " +
-                "d.Price, d.OldPrice " +
+                "d.Price, d.OldPrice, d.StockQuantity " +
                 "FROM products p " +
                 "JOIN productdetails d ON p.ProductID = d.ProductID ");
 
@@ -129,6 +129,7 @@ public class ProductService {
                 p.setSold(rs.getInt("SoldQuantity"));
                 p.setPrice(rs.getDouble("Price"));
                 p.setOldPrice(rs.getDouble("OldPrice"));
+                p.setStock(rs.getInt("StockQuantity"));
                 list.add(p);
             }
         } catch (SQLException e) {

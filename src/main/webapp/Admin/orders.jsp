@@ -7,14 +7,11 @@
     <meta charset="utf-8"/>
     <title>MedHome Admin — Đơn hàng</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/Admin/admin.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/Admin/admin.css?v=3"/>
     <style>
         .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-        .btn-confirm { background: #2ecc71; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
-        .btn-cancel  { background: #e74c3c; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
-        .btn-confirm:hover { background: #27ae60; }
-        .btn-cancel:hover  { background: #c0392b; }
-        code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+        code { background: var(--page-bg); padding: 2px 6px; border-radius: 3px; font-size: 12px; color: var(--text); }
     </style>
 </head>
 <body>
@@ -27,8 +24,8 @@
         <button type="submit">Tìm</button>
     </form>
     <nav class="header-right">
-        <a class="topbtn" href="#" title="Thông báo">🔔</a>
-        <a class="topbtn" href="#" title="Tài khoản">👤</a>
+        <a class="topbtn" href="#" title="Thông báo"><i class="fa-solid fa-bell"></i></a>
+        <a class="topbtn" href="#" title="Tài khoản"><i class="fa-solid fa-user"></i></a>
     </nav>
 </header>
 
@@ -37,10 +34,10 @@
     <aside id="sidebar" class="sidebar" aria-hidden="false">
         <div class="sidebar-title">Quản trị</div>
         <nav class="menu">
-            <a class="menu-item" href="overview">🏠 Tổng quan</a>
-            <a class="menu-item" href="accounts">👥 Tài khoản</a>
-            <a class="menu-item" href="products">🧰 Sản phẩm</a>
-            <a class="menu-item active" href="orders">🧾 Đơn hàng</a>
+            <a class="menu-item" href="overview">Tổng quan</a>
+            <a class="menu-item" href="accounts">Tài khoản</a>
+            <a class="menu-item" href="products">Sản phẩm</a>
+            <a class="menu-item active" href="orders">Đơn hàng</a>
         </nav>
     </aside>
 
@@ -90,7 +87,7 @@
                 <input type="hidden" name="action" value="syncGhn"/>
                 <button class="btn btn-ghost" type="submit"
                         onclick="return confirm('Đồng bộ trạng thái từ GHN?')">
-                    🔄 Đồng bộ GHN
+                    <i class="fa-solid fa-rotate"></i> Đồng bộ GHN
                 </button>
             </form>
         </div>
@@ -148,18 +145,18 @@
                                                     <input type="hidden" name="action" value="updateStatus"/>
                                                     <input type="hidden" name="id" value="${o.orderId}"/>
                                                     <input type="hidden" name="status" value="Processing"/>
-                                                    <button class="btn-confirm" type="submit"
+                                                    <button class="btn" style="padding:5px 12px; font-size:13px;" type="submit"
                                                             onclick="return confirm('Xác nhận đơn DH${o.orderId}?\nHệ thống sẽ tạo vận đơn GHN tự động.')">
-                                                        ✔ Xác nhận
+                                                        <i class="fa-solid fa-check"></i> Xác nhận
                                                     </button>
                                                 </form>
                                                 <form action="orders" method="post">
                                                     <input type="hidden" name="action" value="updateStatus"/>
                                                     <input type="hidden" name="id" value="${o.orderId}"/>
                                                     <input type="hidden" name="status" value="Cancelled"/>
-                                                    <button class="btn-cancel" type="submit"
+                                                    <button class="btn btn-danger" style="padding:5px 12px; font-size:13px;" type="submit"
                                                             onclick="return confirm('Hủy đơn DH${o.orderId}?')">
-                                                        ✖ Hủy
+                                                        <i class="fa-solid fa-xmark"></i> Hủy
                                                     </button>
                                                 </form>
                                             </c:when>
@@ -174,8 +171,6 @@
                 </table>
             </div>
         </section>
-
-        <footer class="foot">© 2025 MedHome Admin</footer>
 
     </main>
 </div>
