@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.service;
 
 import vn.edu.hcmuaf.fit.dao.OrderDAO;
+import vn.edu.hcmuaf.fit.service.InventoryService;
 import vn.edu.hcmuaf.fit.dao.OrderShippingDAO;
 import vn.edu.hcmuaf.fit.dao.OrderShippingGhnDAO;
 import vn.edu.hcmuaf.fit.dao.ProductDAO;
@@ -114,6 +115,16 @@ public class OrderService {
         System.out.println("[OrderService] createOrder returned orderId=" + orderId);
 
         if (orderId != -1) {
+            List<InventoryService.OrderStockItem> stockItems = new java.util.ArrayList<>();
+            for (java.util.Map.Entry<Integer, CartItem> entry : cart.getData().entrySet()) {
+                CartItem item = entry.getValue();
+                stockItems.add(new InventoryService.OrderStockItem(item.getProduct().getId(), item.getQuantity()));
+            }
+            boolean stockOk = InventoryService.getInstance().deductStockForOrder(orderId, stockItems);
+            if (!stockOk) {
+                System.out.println("[OrderService] Warning: stock deduction failed for order " + orderId);
+            }
+
             CartService.getInstance().clearCart(customerId);
             return true;
         }
@@ -123,7 +134,7 @@ public class OrderService {
     // Overload method cũ để tương thích ngược
     public boolean placeOrder(int customerId, String recipientName, String recipientPhone, String shippingAddress,
                               int toDistrictId, String toWardCode, String paymentMethod) {
-        return placeOrder(customerId, recipientName, recipientPhone, shippingAddress, 
+        return placeOrder(customerId, recipientName, recipientPhone, shippingAddress,
                          toDistrictId, toWardCode, paymentMethod, null);
     }
 
