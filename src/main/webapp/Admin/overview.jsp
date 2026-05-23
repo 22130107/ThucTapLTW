@@ -27,7 +27,9 @@
 
                 <nav class="header-right">
                     <a class="topbtn" href="#" title="Thông báo"><i class="fa-solid fa-bell"></i></a>
-                    <a class="topbtn" href="#" title="Tài khoản"><i class="fa-solid fa-user"></i></a>
+                    <span class="topbtn" style="cursor: default;">
+                        <i class="fa-solid fa-user"></i> ${auth.username}
+                    </span>
                 </nav>
 
             </header>
@@ -38,21 +40,24 @@
 
                 <!-- SIDEBAR -->
                 <aside id="sidebar" class="sidebar" aria-hidden="false">
-
                     <div class="sidebar-title">Quản trị</div>
-
                     <nav class="menu">
                         <a class="menu-item active" href="overview">Tổng quan</a>
                         <a class="menu-item" href="accounts">Tài khoản</a>
                         <a class="menu-item" href="products">Sản phẩm</a>
+                        <a class="menu-item" href="promocodes">Khuyến mãi</a>
                         <a class="menu-item" href="orders">Đơn hàng</a>
-                        <a class="menu-item" href="appointments">Lịch khám</a>
                     </nav>
+                    <div class="sidebar-logout">
+                        <a class="logout-btn" href="${pageContext.request.contextPath}/logout"
+                           onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
+                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                        </a>
+                    </div>
                 </aside>
 
                 <!-- CONTENT -->
                 <main class="content">
-
                     <h2>Bảng điều khiển</h2>
 
                     <!-- KPIs -->
@@ -68,13 +73,6 @@
                             <h3>Đơn hàng</h3>
                             <p class="value">${totalOrders}</p>
                             <p class="sub">Tổng đơn hàng</p>
-                        </div>
-
-
-                        <div class="stat-card">
-                            <h3>Lịch khám hôm nay</h3>
-                            <p class="value">${appointmentsToday}</p>
-                            <p class="sub">Lịch hẹn trong ngày</p>
                         </div>
 
                         <div class="stat-card">
