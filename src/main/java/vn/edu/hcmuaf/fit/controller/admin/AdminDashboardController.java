@@ -3,6 +3,7 @@ package vn.edu.hcmuaf.fit.controller.admin;
 import vn.edu.hcmuaf.fit.dao.AccountDAO;
 import vn.edu.hcmuaf.fit.dao.DashboardDAO;
 import vn.edu.hcmuaf.fit.dao.OrderDAO;
+import vn.edu.hcmuaf.fit.service.InventoryService;
 import vn.edu.hcmuaf.fit.service.ProductService;
 
 import jakarta.servlet.ServletException;
@@ -27,9 +28,12 @@ public class AdminDashboardController extends HttpServlet {
         List<String[]> revenueData = DashboardDAO.getInstance().getMonthlyRevenueLast6Months();
         List<String[]> categoryData = DashboardDAO.getInstance().getProductsCountByCategory();
 
+        int lowStockCount = InventoryService.getInstance().countLowStockProducts();
+
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("totalOrders", totalOrders);
         request.setAttribute("totalAccounts", totalAccounts);
+        request.setAttribute("lowStockCount", lowStockCount);
 
         request.setAttribute("revenueData", revenueData);
         request.setAttribute("categoryData", categoryData);

@@ -44,6 +44,7 @@
                             <a class="menu-item" href="products">Sản phẩm</a>
                             <a class="menu-item" href="promocodes">Khuyến mãi</a>
                             <a class="menu-item" href="orders">Đơn hàng</a>
+                            <a class="menu-item" href="inventory">Kho hàng</a>
                             <a class="menu-item active" href="appointments">Lịch khám</a>
                         </nav>
 

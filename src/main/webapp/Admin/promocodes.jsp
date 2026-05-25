@@ -34,8 +34,9 @@
             <a class="menu-item" href="products">Sản phẩm</a>
             <a class="menu-item" href="categories">Danh mục</a>
             <a class="menu-item active" href="promocodes">Khuyến mãi</a>
-            <a class="menu-item" href="orders">Đơn hàng</a>
-        </nav>
+                            <a class="menu-item" href="orders">Đơn hàng</a>
+                            <a class="menu-item" href="inventory">Kho hàng</a>
+                        </nav>
         <div class="sidebar-logout">
             <a class="logout-btn" href="${pageContext.request.contextPath}/logout"
                onclick="return confirm('Bạn có chắc muốn đăng xuất?')">

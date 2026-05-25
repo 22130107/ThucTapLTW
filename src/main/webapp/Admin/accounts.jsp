@@ -47,6 +47,7 @@
                             <a class="menu-item" href="categories">Danh mục</a>
                             <a class="menu-item" href="promocodes">Khuyến mãi</a>
                             <a class="menu-item" href="orders">Đơn hàng</a>
+                            <a class="menu-item" href="inventory">Kho hàng</a>
                         </nav>
                         <div class="sidebar-logout">
                             <a class="logout-btn" href="${pageContext.request.contextPath}/logout"
