@@ -41,21 +41,11 @@
                             <section class="filter-block brand">
                                 <h3 class="filter-title">Mặt Hàng</h3>
                                 <div class="filter-list" id="brandList">
-                                    <label class="chk"><input type="checkbox" name="brand" value="Reiwa"
-                                            ${selectedBrands.contains("Reiwa") ? "checked" : "" }>
-                                        <span>Reiwa</span></label>
-                                    <label class="chk"><input type="checkbox" name="brand" value="Kakusan"
-                                            ${selectedBrands.contains("Kakusan") ? "checked" : "" }>
-                                        <span>Kakusan</span></label>
-                                    <label class="chk"><input type="checkbox" name="brand" value="TouchBeauty"
-                                            ${selectedBrands.contains("TouchBeauty") ? "checked" : "" }>
-                                        <span>TouchBeauty</span></label>
-                                    <label class="chk"><input type="checkbox" name="brand" value="ROAMAN"
-                                            ${selectedBrands.contains("ROAMAN") ? "checked" : "" }>
-                                        <span>ROAMAN</span></label>
-                                    <label class="chk"><input type="checkbox" name="brand" value="Microfiber"
-                                            ${selectedBrands.contains("Microfiber") ? "checked" : "" }>
-                                        <span>Microfiber</span></label>
+                                    <c:forEach var="b" items="${allBrands}">
+                                        <label class="chk"><input type="checkbox" name="brand" value="${b}"
+                                                ${selectedBrands.contains(b) ? "checked" : "" }>
+                                            <span>${b}</span></label>
+                                    </c:forEach>
                                 </div>
                             </section>
 

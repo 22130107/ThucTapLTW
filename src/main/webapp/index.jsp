@@ -36,20 +36,14 @@
                                 <div id="category-list" class="category-list" role="list">
                                     <c:if test="${not empty categories}">
                                         <c:forEach var="category" items="${categories}">
-                                            <c:choose>
-                                                <c:when test="${category.slug == 'cham-soc-suc-khoe'}">
-                                                    <a class="category-link"
-                                                        href="${pageContext.request.contextPath}/booking">
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <a class="category-link" href="catalog?cid=${category.categoryID}">
-                                                </c:otherwise>
-                                            </c:choose>
-                                            <div class="category-item">
-                                                <img src="${category.image}" alt="${category.categoryName}">
-                                                <span>${category.categoryName}</span>
-                                            </div>
-                                            </a>
+                                            <c:if test="${category.slug != 'cham-soc-suc-khoe'}">
+                                                <a class="category-link" href="catalog?cid=${category.categoryID}">
+                                                    <div class="category-item">
+                                                        <img src="${category.image}" alt="${category.categoryName}">
+                                                        <span>${category.categoryName}</span>
+                                                    </div>
+                                                </a>
+                                            </c:if>
                                         </c:forEach>
                                     </c:if>
                                     <c:if test="${categories != null && empty categories}">
@@ -99,7 +93,7 @@
                             <%-- Category Sections --%>
                                 <c:set var="stopRender" value="false" scope="page" />
                                 <c:forEach var="cat" items="${categories}">
-                                    <c:if test="${cat.slug == 'thuc-pham-chuc-nang' || cat.categoryName == 'THỰC PHẨM CHỨC NĂNG'}">
+                                    <c:if test="${cat.slug == 'thuc-pham-chuc-nang' || cat.categoryName == 'THỰC PHẨM CHỨC NĂNG' || cat.slug == 'cham-soc-suc-khoe'}">
                                         <c:set var="stopRender" value="true" scope="page" />
                                     </c:if>
 
