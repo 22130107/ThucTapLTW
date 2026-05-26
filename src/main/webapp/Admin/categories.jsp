@@ -23,7 +23,9 @@
         </div>
         <nav class="header-right">
             <a class="topbtn" href="#" title="Thông báo"><i class="fa-solid fa-bell"></i></a>
-            <a class="topbtn" href="#" title="Tài khoản"><i class="fa-solid fa-user"></i></a>
+            <span class="topbtn" style="cursor: default;">
+                <i class="fa-solid fa-user"></i> ${auth.username}
+            </span>
         </nav>
     </header>
 
@@ -37,15 +39,34 @@
                 <a class="menu-item" href="overview">Tổng quan</a>
                 <a class="menu-item" href="accounts">Tài khoản</a>
                 <a class="menu-item" href="products">Sản phẩm</a>
+                <a class="menu-item" href="promocodes">Khuyến mãi</a>
                 <a class="menu-item" href="orders">Đơn hàng</a>
-                <a class="menu-item" href="appointments">Lịch khám</a>
             </nav>
+            <div class="sidebar-logout">
+                <a class="logout-btn" href="${pageContext.request.contextPath}/logout"
+                   onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
+                    <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                </a>
+            </div>
         </aside>
 
         <!-- CONTENT -->
         <main class="content">
 
             <h2>Quản lý danh mục sản phẩm</h2>
+
+            <c:if test="${not empty sessionScope.errorMsg}">
+                <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 12px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <strong>Lỗi:</strong> ${sessionScope.errorMsg}
+                </div>
+                <c:remove var="errorMsg" scope="session" />
+            </c:if>
+            <c:if test="${not empty sessionScope.successMsg}">
+                <div style="color: #0f5132; background-color: #d1e7dd; border: 1px solid #badbcc; padding: 12px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-circle-check"></i> <strong>Thành công:</strong> ${sessionScope.successMsg}
+                </div>
+                <c:remove var="successMsg" scope="session" />
+            </c:if>
 
             <!-- ACTIONS -->
             <div class="actions" style="margin: 15px 0;">
@@ -105,6 +126,7 @@
         <div class="modal-body">
             <h3>Thêm danh mục</h3>
             <form class="form" action="categories" method="post">
+                <input type="hidden" name="csrf_token" value="${csrfToken}" />
                 <input type="hidden" name="action" value="add">
                 <label>Tên danh mục
                     <input class="input" name="name" required />
@@ -132,6 +154,7 @@
         <div class="modal-body">
             <h3>Sửa danh mục</h3>
             <form class="form" id="form-edit" action="categories" method="post">
+                <input type="hidden" name="csrf_token" value="${csrfToken}" />
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" name="id" id="edit-id">
                 <label>Tên danh mục
@@ -161,6 +184,7 @@
             <h3>Xóa danh mục?</h3>
             <p>Bạn có chắc chắn muốn xóa danh mục này không? Các sản phẩm thuộc danh mục này sẽ có thể bị ảnh hưởng.</p>
             <form action="categories" method="post">
+                <input type="hidden" name="csrf_token" value="${csrfToken}" />
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="id" id="delete-id">
                 <div class="actions">
