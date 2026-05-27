@@ -61,10 +61,10 @@
 
                         <nav class="nav-links" aria-label="Điều hướng chính">
                             <a href="${pageContext.request.contextPath}/index.jsp">TRANG CHỦ</a>
-                            <a href="#">GIỚI THIỆU</a>
+                            <a href="${pageContext.request.contextPath}/about">GIỚI THIỆU</a>
                             <a href="${pageContext.request.contextPath}/catalog">SẢN PHẨM</a>
-                            <a href="#">TIN TỨC</a>
-                            <a href="#">LIÊN HỆ</a>
+                            <a href="${pageContext.request.contextPath}/news">TIN TỨC</a>
+                            <a href="${pageContext.request.contextPath}/contact">LIÊN HỆ</a>
                         </nav>
 
                         <div class="cart-wrap">
