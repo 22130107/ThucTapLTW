@@ -298,6 +298,10 @@ public class ProductService {
     }
 
     public List<Product> filterAdmin(String search, String brand, String status, String priceRange) {
+        return getAdminProducts(search, brand, status, priceRange, 0, Integer.MAX_VALUE);
+    }
+
+    public List<Product> getAdminProducts(String search, String brand, String status, String priceRange, int offset, int limit) {
         List<Product> list = new ArrayList<>();
         Connection conn = DBConnect.get();
         if (conn == null)
@@ -310,63 +314,22 @@ public class ProductService {
                 "JOIN productdetails d ON p.ProductID = d.ProductID " +
                 "WHERE d.StockQuantity >= 0 ");
 
-        if (search != null && !search.trim().isEmpty()) {
-            sql.append("AND (p.ProductName LIKE ? OR p.ProductID = ?) ");
-        }
-
-        if (brand != null && !brand.isEmpty()) {
-            sql.append("AND p.Brand = ? ");
-        }
-
-        if (status != null && !status.isEmpty()) {
-            if ("Còn hàng".equals(status)) {
-                sql.append("AND d.StockQuantity > 0 ");
-            } else if ("Hết hàng".equals(status)) {
-                sql.append("AND d.StockQuantity = 0 ");
-            }
-        }
-
-        double minPrice = 0;
-        double maxPrice = Double.MAX_VALUE;
-        if (priceRange != null && !priceRange.isEmpty()) {
-            try {
-                String[] parts = priceRange.split("-");
-                if (parts.length >= 1)
-                    minPrice = Double.parseDouble(parts[0]);
-                if (parts.length >= 2)
-                    maxPrice = Double.parseDouble(parts[1]);
-                sql.append("AND d.Price >= ? AND d.Price <= ? ");
-            } catch (NumberFormatException e) {
-
-            }
-        }
-
-        sql.append("ORDER BY p.ProductID DESC");
+        appendAdminFilterSql(sql, search, brand, status, priceRange);
+        sql.append("ORDER BY p.ProductID DESC ");
+        sql.append("LIMIT ? OFFSET ?");
 
         try {
             PreparedStatement ps = conn.prepareStatement(sql.toString());
-            int index = 1;
+            int index = setAdminFilterParameters(ps, search, brand, status, priceRange);
 
-            if (search != null && !search.trim().isEmpty()) {
-                ps.setString(index++, "%" + search + "%");
-                int idTry = -1;
-                try {
-                    idTry = Integer.parseInt(search.replace("SP", ""));
-                } catch (Exception e) {
-                }
-                ps.setInt(index++, idTry);
+            if (limit <= 0) {
+                limit = 15;
             }
-
-            if (brand != null && !brand.isEmpty()) {
-                ps.setString(index++, brand);
+            if (offset < 0) {
+                offset = 0;
             }
-
-            if (priceRange != null && !priceRange.isEmpty()) {
-                if (minPrice != 0 || maxPrice != Double.MAX_VALUE) {
-                    ps.setDouble(index++, minPrice);
-                    ps.setDouble(index++, maxPrice);
-                }
-            }
+            ps.setInt(index++, limit);
+            ps.setInt(index, offset);
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -389,6 +352,131 @@ public class ProductService {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public int countProductsAdmin(String search, String brand, String status, String priceRange) {
+        int total = 0;
+        Connection conn = DBConnect.get();
+        if (conn == null)
+            return total;
+
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM products p " +
+                "JOIN productdetails d ON p.ProductID = d.ProductID " +
+                "WHERE d.StockQuantity >= 0 ");
+
+        appendAdminFilterSql(sql, search, brand, status, priceRange);
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql.toString());
+            setAdminFilterParameters(ps, search, brand, status, priceRange);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
+    }
+
+    public boolean bulkDeleteProducts(java.util.List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return false;
+        }
+
+        Connection conn = DBConnect.get();
+        if (conn == null)
+            return false;
+
+        StringBuilder sql = new StringBuilder("UPDATE productdetails SET StockQuantity = -1 WHERE ProductID IN (");
+        for (int i = 0; i < ids.size(); i++) {
+            sql.append(i == 0 ? "?" : ", ?");
+        }
+        sql.append(")");
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql.toString());
+            for (int i = 0; i < ids.size(); i++) {
+                ps.setInt(i + 1, ids.get(i));
+            }
+            int affected = ps.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void appendAdminFilterSql(StringBuilder sql, String search, String brand, String status, String priceRange) {
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (p.ProductName LIKE ? OR p.ProductID = ?) ");
+        }
+
+        if (brand != null && !brand.isEmpty()) {
+            sql.append("AND p.Brand = ? ");
+        }
+
+        if (status != null && !status.isEmpty()) {
+            if ("Còn hàng".equals(status)) {
+                sql.append("AND d.StockQuantity > 0 ");
+            } else if ("Hết hàng".equals(status)) {
+                sql.append("AND d.StockQuantity = 0 ");
+            }
+        }
+
+        if (priceRange != null && !priceRange.isEmpty()) {
+            try {
+                String[] parts = priceRange.split("-");
+                if (parts.length >= 1 && !parts[0].isEmpty()) {
+                    Double.parseDouble(parts[0]);
+                }
+                if (parts.length >= 2 && !parts[1].isEmpty()) {
+                    Double.parseDouble(parts[1]);
+                }
+                sql.append("AND d.Price >= ? AND d.Price <= ? ");
+            } catch (NumberFormatException e) {
+                // ignore invalid price range format
+            }
+        }
+    }
+
+    private int setAdminFilterParameters(PreparedStatement ps, String search, String brand, String status, String priceRange) throws SQLException {
+        int index = 1;
+
+        if (search != null && !search.trim().isEmpty()) {
+            ps.setString(index++, "%" + search + "%");
+            int idTry = -1;
+            try {
+                idTry = Integer.parseInt(search.replace("SP", ""));
+            } catch (Exception e) {
+            }
+            ps.setInt(index++, idTry);
+        }
+
+        if (brand != null && !brand.isEmpty()) {
+            ps.setString(index++, brand);
+        }
+
+        if (priceRange != null && !priceRange.isEmpty()) {
+            try {
+                String[] parts = priceRange.split("-");
+                double minPrice = 0;
+                double maxPrice = Double.MAX_VALUE;
+                if (parts.length >= 1 && !parts[0].isEmpty()) {
+                    minPrice = Double.parseDouble(parts[0]);
+                }
+                if (parts.length >= 2 && !parts[1].isEmpty()) {
+                    maxPrice = Double.parseDouble(parts[1]);
+                }
+                ps.setDouble(index++, minPrice);
+                ps.setDouble(index++, maxPrice);
+            } catch (NumberFormatException e) {
+                // ignore invalid price values
+            }
+        }
+
+        return index;
     }
 
     public boolean addProduct(Product p) {
@@ -417,7 +505,9 @@ public class ProductService {
                     ps2.setInt(1, productId);
                     ps2.setDouble(2, p.getPrice());
                     ps2.setInt(3, p.getStock());
-                    ps2.setString(4, p.getDescription());
+                    // Sanitize rich text description to reduce XSS risk
+                    String safeDesc = vn.edu.hcmuaf.fit.util.HtmlSanitizer.sanitize(p.getDescription());
+                    ps2.setString(4, safeDesc);
 
                     ps2.executeUpdate();
 
@@ -465,7 +555,9 @@ public class ProductService {
             PreparedStatement ps2 = conn.prepareStatement(sql2);
             ps2.setDouble(1, p.getPrice());
             ps2.setInt(2, p.getStock());
-            ps2.setString(3, p.getDescription());
+            // Sanitize rich text description to reduce XSS risk
+            String safeDesc = vn.edu.hcmuaf.fit.util.HtmlSanitizer.sanitize(p.getDescription());
+            ps2.setString(3, safeDesc);
             ps2.setInt(4, p.getId());
 
             ps2.executeUpdate();
