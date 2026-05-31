@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="vn.edu.hcmuaf.fit.util.GoogleUtils" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -161,17 +162,21 @@
 
       <!-- Social -->
       <div class="social-buttons">
-        <button type="button" class="btn-social btn-zalo">
+        <a href="${pageContext.request.contextPath}/login-zalo" class="btn-social btn-zalo">
           <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect width="48" height="48" rx="10" fill="#0068FF"/>
             <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="20" fill="white">Z</text>
           </svg>
-          Đăng ký bằng Zalo
-        </button>
-        <button type="button" class="btn-social btn-google">
+          Đăng nhập bằng Zalo
+        </a>
+
+        <%
+          String googleLoginLink = vn.edu.hcmuaf.fit.util.GoogleUtils.buildLoginUrl();
+        %>
+        <a href="<%= googleLoginLink %>" class="btn-social btn-google">
           <i class="fa-brands fa-google" style="font-size:17px;color:#ea4335;" aria-hidden="true"></i>
-          Đăng ký bằng Google
-        </button>
+          Đăng nhập bằng Google
+        </a>
       </div>
 
     </div><!-- /auth-card-body -->
