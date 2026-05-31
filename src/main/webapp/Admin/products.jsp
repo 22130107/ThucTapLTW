@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
     <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
         <%@ page contentType="text/html;charset=UTF-8" language="java" %>
             <!doctype html>
@@ -25,7 +26,9 @@
                     </form>
                     <nav class="header-right">
                         <a class="topbtn" href="#" title="Thông báo"><i class="fa-solid fa-bell"></i></a>
-                        <a class="topbtn" href="#" title="Tài khoản"><i class="fa-solid fa-user"></i></a>
+                        <span class="topbtn" style="cursor: default;">
+                            <i class="fa-solid fa-user"></i> ${auth.username}
+                        </span>
                     </nav>
                 </header>
 
@@ -34,12 +37,21 @@
 
                     <!-- SIDEBAR -->
                     <aside id="sidebar" class="sidebar" aria-hidden="false">
+                        <div class="sidebar-title">Quản trị</div>
                         <nav class="menu">
                             <a class="menu-item" href="overview">Tổng quan</a>
                             <a class="menu-item" href="accounts">Tài khoản</a>
                             <a class="menu-item active" href="products">Sản phẩm</a>
+                            <a class="menu-item" href="categories">Danh mục</a>
+                            <a class="menu-item" href="promocodes">Khuyến mãi</a>
                             <a class="menu-item" href="orders">Đơn hàng</a>
                         </nav>
+                        <div class="sidebar-logout">
+                            <a class="logout-btn" href="${pageContext.request.contextPath}/logout"
+                               onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
+                                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                            </a>
+                        </div>
                     </aside>
 
                     <!-- CONTENT -->
@@ -52,6 +64,12 @@
                                 <i class="fa-solid fa-triangle-exclamation"></i> <strong>Lỗi:</strong> ${sessionScope.errorMsg}
                             </div>
                             <c:remove var="errorMsg" scope="session" />
+                        </c:if>
+                        <c:if test="${not empty sessionScope.successMsg}">
+                            <div style="color: #0f5132; background-color: #d1e7dd; border: 1px solid #badbcc; padding: 12px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-circle-check"></i> <strong>Thành công:</strong> ${sessionScope.successMsg}
+                            </div>
+                            <c:remove var="successMsg" scope="session" />
                         </c:if>
 
                         <!-- BỘ LỌC -->
@@ -93,10 +111,12 @@
                         </section>
 
                         <!-- ACTIONS -->
-                        <div class="actions">
+                        <div class="actions" style="gap:8px; flex-wrap:wrap; align-items:center;">
                             <a class="btn" href="#modal-add">Thêm sản phẩm</a>
-                            <a class="btn btn-ghost" href="#modal-edit" id="btn-edit">Sửa</a>
-                            <a class="btn btn-danger" href="#modal-delete" id="btn-delete">Xóa</a>
+                            <a class="btn btn-ghost" href="#" id="btn-edit">Sửa</a>
+                            <a class="btn btn-danger" href="#" id="btn-delete">Xóa</a>
+                            <a class="btn btn-danger" href="#" id="btn-bulk-delete">Xóa đã chọn</a>
+                            <span id="selection-count" style="font-size:0.95rem; color:#555;">Đã chọn 0 sản phẩm</span>
                         </div>
 
                         <!-- Thông báo -->
@@ -115,7 +135,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" aria-label="Chọn tất cả" /></th>
+                                            <th><input id="select-all" type="checkbox" aria-label="Chọn tất cả" /></th>
                                             <th>Mã</th>
                                             <th>Hình ảnh</th>
                                             <th>Tên</th>
@@ -127,10 +147,10 @@
                                     </thead>
                                     <tbody>
                                         <c:forEach items="${listP}" var="p">
-                                            <tr data-id="${p.id}" data-name="${p.name}" data-img="${p.img}"
-                                                data-brand="${p.brand}" data-price="${p.price}" data-stock="${p.stock}"
-                                                data-description="${p.description}" data-category="${p.categoryId}">
-                                                <td><input type="checkbox" aria-label="Chọn" /></td>
+                                            <tr data-id="${p.id}" data-name="${fn:escapeXml(p.name)}" data-img="${fn:escapeXml(p.img)}"
+                                                data-brand="${fn:escapeXml(p.brand)}" data-price="${p.price}" data-stock="${p.stock}"
+                                                data-description="${fn:escapeXml(p.description)}" data-category="${p.categoryId}">
+                                                <td><input class="bulk-select" type="checkbox" name="selectedIds" value="${p.id}" aria-label="Chọn" /></td>
                                                 <td>SP${p.id}</td>
                                                 <td>
                                                     <img src="${p.img}" alt=""
@@ -160,6 +180,22 @@
                             </div>
                         </section>
 
+                        <section class="card" style="margin-top:16px; padding:14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <div style="color:#444;">Tổng <strong>${totalItems}</strong> sản phẩm</div>
+                            <div class="pagination" style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <c:set var="queryPrefix" value="${not empty queryString ? queryString + '&' : ''}" />
+                                <c:if test="${currentPage > 1}">
+                                    <a class="btn btn-ghost" href="products?${queryPrefix}page=${currentPage-1}&size=${pageSize}">Trang trước</a>
+                                </c:if>
+                                <c:forEach var="i" begin="1" end="${totalPages}">
+                                    <a class="btn ${i == currentPage ? 'btn-primary' : 'btn btn-ghost'}" href="products?${queryPrefix}page=${i}&size=${pageSize}">${i}</a>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                    <a class="btn btn-ghost" href="products?${queryPrefix}page=${currentPage+1}&size=${pageSize}">Trang sau</a>
+                                </c:if>
+                            </div>
+                        </section>
+
                     </main>
 
                 </div>
@@ -172,6 +208,7 @@
                     <div class="modal-body">
                         <h3>Thêm sản phẩm</h3>
                         <form class="form" action="products" method="post">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <input type="hidden" name="action" value="add">
                             <label>Tên
                                 <input class="input" name="name" required />
@@ -222,6 +259,7 @@
                     <div class="modal-body">
                         <h3>Sửa sản phẩm</h3>
                         <form class="form" id="form-edit" action="products" method="post">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <input type="hidden" name="action" value="update">
                             <input type="hidden" name="id" id="edit-id">
                             <label>Tên
@@ -275,11 +313,30 @@
                         <h3>Xóa sản phẩm?</h3>
                         <p>Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.</p>
                         <form action="products" method="post">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" id="delete-id">
                             <div class="actions">
                                 <a class="btn btn-ghost" href="#">Hủy</a>
                                 <button class="btn btn-danger" type="submit">Xóa vĩnh viễn</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- XÓA NHIỀU -->
+                <div id="modal-bulk-delete" class="modal modal-sm">
+                    <a href="#" class="modal-overlay" aria-label="Đóng"></a>
+                    <div class="modal-body">
+                        <h3>Xóa các sản phẩm đã chọn?</h3>
+                        <p>Bạn có chắc chắn muốn xóa những sản phẩm này không? Hành động này không thể hoàn tác.</p>
+                        <form id="bulk-delete-form" action="products" method="post">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
+                            <input type="hidden" name="action" value="bulkDelete">
+                            <div id="bulk-selected-inputs"></div>
+                            <div class="actions">
+                                <a class="btn btn-ghost" href="#">Hủy</a>
+                                <button class="btn btn-danger" type="submit">Xóa tất cả</button>
                             </div>
                         </form>
                     </div>
@@ -421,6 +478,50 @@
                         const id = tr.dataset.id;
                         document.getElementById('delete-id').value = id;
                     });
+
+                    document.getElementById('btn-bulk-delete').addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const checks = document.querySelectorAll('tbody input.bulk-select:checked');
+                        if (checks.length === 0) {
+                            alert('Vui lòng chọn ít nhất một sản phẩm để xóa.');
+                            return;
+                        }
+                        const container = document.getElementById('bulk-selected-inputs');
+                        container.innerHTML = '';
+                        checks.forEach((checkbox) => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'selectedIds';
+                            input.value = checkbox.value;
+                            container.appendChild(input);
+                        });
+                        location.hash = '#modal-bulk-delete';
+                    });
+
+                    const selectAllCheckbox = document.getElementById('select-all');
+                    const itemCheckboxes = document.querySelectorAll('tbody input.bulk-select');
+                    const selectionCount = document.getElementById('selection-count');
+
+                    function updateSelectionCount() {
+                        const checkedCount = document.querySelectorAll('tbody input.bulk-select:checked').length;
+                        selectionCount.textContent = `Đã chọn ${checkedCount} sản phẩm`;
+                    }
+
+                    selectAllCheckbox.addEventListener('change', function () {
+                        itemCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+                        updateSelectionCount();
+                    });
+
+                    itemCheckboxes.forEach(cb => cb.addEventListener('change', function () {
+                        if (!this.checked) {
+                            selectAllCheckbox.checked = false;
+                        } else if (document.querySelectorAll('tbody input.bulk-select:not(:checked)').length === 0) {
+                            selectAllCheckbox.checked = true;
+                        }
+                        updateSelectionCount();
+                    }));
+
+                    updateSelectionCount();
                 </script>
             </body>
 

@@ -42,6 +42,7 @@
                             <a class="menu-item" href="overview">Tổng quan</a>
                             <a class="menu-item" href="accounts">Tài khoản</a>
                             <a class="menu-item" href="products">Sản phẩm</a>
+                            <a class="menu-item" href="promocodes">Khuyến mãi</a>
                             <a class="menu-item" href="orders">Đơn hàng</a>
                             <a class="menu-item active" href="appointments">Lịch khám</a>
                         </nav>
@@ -73,6 +74,19 @@
                         </div>
 
                         <!-- Thống kê nhanh -->
+                        <c:if test="${not empty sessionScope.errorMsg}">
+                            <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 12px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> <strong>Lỗi:</strong> ${sessionScope.errorMsg}
+                            </div>
+                            <c:remove var="errorMsg" scope="session" />
+                        </c:if>
+                        <c:if test="${not empty sessionScope.successMsg}">
+                            <div style="color: #0f5132; background-color: #d1e7dd; border: 1px solid #badbcc; padding: 12px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-circle-check"></i> <strong>Thành công:</strong> ${sessionScope.successMsg}
+                            </div>
+                            <c:remove var="successMsg" scope="session" />
+                        </c:if>
+
                         <div class="stats-row">
                             <div class="stat-card">
                                 <div class="stat-label">Tổng lịch hôm nay</div>
@@ -242,6 +256,7 @@
                                                     <div class="cell-actions">
                                                         <form action="appointments" method="post"
                                                             style="display:inline;">
+                                                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                             <input type="hidden" name="id" value="${a.appointmentID}">
                                                             <input type="hidden" name="action" value="updateStatus">
 

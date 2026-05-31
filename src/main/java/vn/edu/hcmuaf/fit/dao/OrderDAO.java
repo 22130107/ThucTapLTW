@@ -32,7 +32,7 @@ public class OrderDAO {
             try {
                 conn.setAutoCommit(false); 
 
-                String sqlOrder = "INSERT INTO orders (CustomerID, TotalAmount, Status, PaymentMethod, RecipientName, ShippingAddress) VALUES (?, ?, ?, ?, ?, ?)";
+                String sqlOrder = "INSERT INTO orders (CustomerID, TotalAmount, Status, PaymentMethod, RecipientName, ShippingAddress, PromoCode, DiscountAmount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS)) {
                     psOrder.setInt(1, order.getCustomerId());
                     psOrder.setDouble(2, order.getTotalAmount());
@@ -40,6 +40,8 @@ public class OrderDAO {
                     psOrder.setString(4, order.getPaymentMethod());
                     psOrder.setString(5, order.getRecipientName());
                     psOrder.setString(6, order.getShippingAddress());
+                    psOrder.setString(7, order.getPromoCode());
+                    psOrder.setDouble(8, order.getDiscountAmount());
                     psOrder.executeUpdate();
 
                     try (ResultSet rsOrder = psOrder.getGeneratedKeys()) {
@@ -92,7 +94,7 @@ public class OrderDAO {
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                list.add(new Order(
+                Order order = new Order(
                         rs.getInt("OrderID"),
                         rs.getInt("CustomerID"),
                         rs.getTimestamp("OrderDate"),
@@ -100,7 +102,10 @@ public class OrderDAO {
                         rs.getString("Status"),
                         rs.getString("PaymentMethod"),
                         rs.getString("RecipientName"),
-                        rs.getString("ShippingAddress")));
+                        rs.getString("ShippingAddress"));
+                order.setPromoCode(rs.getString("PromoCode"));
+                order.setDiscountAmount(rs.getDouble("DiscountAmount"));
+                list.add(order);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -117,7 +122,7 @@ public class OrderDAO {
             ps.setInt(1, customerId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(new Order(
+                    Order order = new Order(
                             rs.getInt("OrderID"),
                             rs.getInt("CustomerID"),
                             rs.getTimestamp("OrderDate"),
@@ -125,7 +130,10 @@ public class OrderDAO {
                             rs.getString("Status"),
                             rs.getString("PaymentMethod"),
                             rs.getString("RecipientName"),
-                            rs.getString("ShippingAddress")));
+                            rs.getString("ShippingAddress"));
+                    order.setPromoCode(rs.getString("PromoCode"));
+                    order.setDiscountAmount(rs.getDouble("DiscountAmount"));
+                    list.add(order);
                 }
             }
         } catch (SQLException e) {
@@ -141,7 +149,7 @@ public class OrderDAO {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Order(
+                    Order order = new Order(
                             rs.getInt("OrderID"),
                             rs.getInt("CustomerID"),
                             rs.getTimestamp("OrderDate"),
@@ -150,6 +158,9 @@ public class OrderDAO {
                             rs.getString("PaymentMethod"),
                             rs.getString("RecipientName"),
                             rs.getString("ShippingAddress"));
+                    order.setPromoCode(rs.getString("PromoCode"));
+                    order.setDiscountAmount(rs.getDouble("DiscountAmount"));
+                    return order;
                 }
             }
         } catch (SQLException e) {

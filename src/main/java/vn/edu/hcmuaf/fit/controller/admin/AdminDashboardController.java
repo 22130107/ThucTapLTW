@@ -1,7 +1,6 @@
 package vn.edu.hcmuaf.fit.controller.admin;
 
 import vn.edu.hcmuaf.fit.dao.AccountDAO;
-import vn.edu.hcmuaf.fit.dao.AppointmentDAO;
 import vn.edu.hcmuaf.fit.dao.DashboardDAO;
 import vn.edu.hcmuaf.fit.dao.OrderDAO;
 import vn.edu.hcmuaf.fit.service.ProductService;
@@ -23,21 +22,17 @@ public class AdminDashboardController extends HttpServlet {
         int totalProducts = ProductService.getInstance().countTotalProducts();
         int totalOrders = OrderDAO.getInstance().countTotalOrders();
         int totalAccounts = new AccountDAO().countTotalAccounts();
-        int appointmentsToday = AppointmentDAO.getInstance().countTotalToday();
 
         // Get aggregated stats for charts
         List<String[]> revenueData = DashboardDAO.getInstance().getMonthlyRevenueLast6Months();
         List<String[]> categoryData = DashboardDAO.getInstance().getProductsCountByCategory();
-        List<String[]> appointmentStatusData = DashboardDAO.getInstance().getAppointmentsCountByStatus();
 
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("totalOrders", totalOrders);
         request.setAttribute("totalAccounts", totalAccounts);
-        request.setAttribute("appointmentsToday", appointmentsToday);
 
         request.setAttribute("revenueData", revenueData);
         request.setAttribute("categoryData", categoryData);
-        request.setAttribute("appointmentStatusData", appointmentStatusData);
 
         request.getRequestDispatcher("/Admin/overview.jsp").forward(request, response);
     }

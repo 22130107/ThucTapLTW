@@ -83,21 +83,51 @@ public class AdminOrderController extends HttpServlet {
             throws IOException {
 
         int    orderId = Integer.parseInt(request.getParameter("id"));
-        String status  = request.getParameter("status");
+        String newStatus  = request.getParameter("status");
 
-        if ("Processing".equals(status)) {
-            // Xác nhận đơn → tạo vận đơn GHN
-            OrderService.getInstance().confirmOrderAndCreateGhn(orderId);
-            OrderDAO.getInstance().updateStatus(orderId, status);
-
-        } else if ("Cancelled".equals(status)) {
-            // Chỉ cho hủy khi đơn đang Pending
-            vn.edu.hcmuaf.fit.model.Order order = OrderDAO.getInstance().getById(orderId);
-            if (order != null && "Pending".equals(order.getStatus())) {
-                OrderDAO.getInstance().updateStatus(orderId, status);
-            }
+        vn.edu.hcmuaf.fit.model.Order order = OrderDAO.getInstance().getById(orderId);
+        if (order == null) {
+            response.sendRedirect("orders");
+            return;
         }
-        // Các trạng thái khác (Shipping, Completed) do GHN sync — không xử lý ở đây
+
+        String currentStatus = order.getStatus();
+
+        // Xử lý theo trạng thái mới
+        switch (newStatus) {
+            case "Processing":
+                // Pending → Processing: Xác nhận đơn và tạo vận đơn GHN
+                if ("Pending".equals(currentStatus)) {
+                    OrderService.getInstance().confirmOrderAndCreateGhn(orderId);
+                    OrderDAO.getInstance().updateStatus(orderId, newStatus);
+                }
+                break;
+
+            case "Shipping":
+                // Processing → Shipping: Bắt đầu giao hàng
+                if ("Processing".equals(currentStatus)) {
+                    OrderDAO.getInstance().updateStatus(orderId, newStatus);
+                }
+                break;
+
+            case "Completed":
+                // Shipping → Completed: Giao hàng thành công
+                if ("Shipping".equals(currentStatus)) {
+                    OrderDAO.getInstance().updateStatus(orderId, newStatus);
+                }
+                break;
+
+            case "Cancelled":
+                // Chỉ cho hủy khi đơn đang Pending hoặc Processing
+                if ("Pending".equals(currentStatus) || "Processing".equals(currentStatus)) {
+                    OrderDAO.getInstance().updateStatus(orderId, newStatus);
+                }
+                break;
+
+            default:
+                // Không làm gì
+                break;
+        }
 
         response.sendRedirect("orders");
     }

@@ -125,8 +125,12 @@
                 <span><fmt:formatNumber value="${item.totalPrice}" type="currency" currencySymbol="₫" /></span>
             </div>
         </c:forEach>
-        <div class="total-price">
+        <div class="total-price" id="originalTotal" data-original="${cart.totalPrice}">
             Tổng cộng: <fmt:formatNumber value="${cart.totalPrice}" type="currency" currencySymbol="₫" />
+        </div>
+        <div id="discountInfo" style="display:none; color: #27ae60; font-weight: bold; margin-top: 10px;">
+            Giảm giá: <span id="discountAmount"></span><br>
+            Thành tiền: <span id="finalTotal"></span>
         </div>
     </div>
 
@@ -178,6 +182,21 @@
             <label for="shippingAddress"><i class="fas fa-home"></i> Địa chỉ chi tiết</label>
             <input type="text" id="shippingAddress" name="shippingAddress" required
                    placeholder="Số nhà, tên đường...">
+        </div>
+
+        <!-- Mã khuyến mãi -->
+        <div class="form-group">
+            <label for="promoCode"><i class="fas fa-tag"></i> Mã khuyến mãi (tùy chọn)</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="promoCode" name="promoCode" 
+                       placeholder="Nhập mã khuyến mãi" 
+                       style="flex: 1;">
+                <button type="button" id="btnApplyPromo" 
+                        style="padding: 12px 24px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    Áp dụng
+                </button>
+            </div>
+            <div id="promoMessage" style="margin-top: 8px; font-size: 14px;"></div>
         </div>
 
         <div class="form-group">
@@ -306,6 +325,75 @@
 
     // Khởi động
     loadProvinces();
+
+    // ---- Xử lý mã khuyến mãi ----
+    let appliedDiscount = 0;
+    let appliedPromoCode = "";
+
+    document.getElementById("btnApplyPromo").addEventListener("click", async function() {
+        const promoCode = document.getElementById("promoCode").value.trim();
+        const promoMessage = document.getElementById("promoMessage");
+        const originalTotal = parseFloat(document.getElementById("originalTotal").dataset.original);
+
+        if (!promoCode) {
+            promoMessage.style.color = "#e74c3c";
+            promoMessage.textContent = "Vui lòng nhập mã khuyến mãi.";
+            return;
+        }
+
+        promoMessage.style.color = "#3498db";
+        promoMessage.textContent = "Đang kiểm tra...";
+
+        try {
+            const response = await fetch("${pageContext.request.contextPath}/api/validate-promo?code=" + encodeURIComponent(promoCode) + "&total=" + originalTotal);
+            const result = await response.json();
+
+            if (result.success) {
+                appliedDiscount = result.discount;
+                appliedPromoCode = promoCode;
+                
+                const finalTotal = originalTotal - appliedDiscount;
+                
+                // Hiển thị thông tin giảm giá
+                document.getElementById("discountAmount").textContent = formatCurrency(appliedDiscount);
+                document.getElementById("finalTotal").textContent = formatCurrency(finalTotal);
+                document.getElementById("discountInfo").style.display = "block";
+                
+                promoMessage.style.color = "#27ae60";
+                promoMessage.textContent = "✓ Áp dụng mã thành công! " + result.message;
+                
+                // Disable input và button sau khi áp dụng thành công
+                document.getElementById("promoCode").disabled = true;
+                this.disabled = true;
+                this.style.backgroundColor = "#95a5a6";
+            } else {
+                promoMessage.style.color = "#e74c3c";
+                promoMessage.textContent = "✗ " + result.message;
+                
+                // Reset discount
+                appliedDiscount = 0;
+                appliedPromoCode = "";
+                document.getElementById("discountInfo").style.display = "none";
+            }
+        } catch (error) {
+            promoMessage.style.color = "#e74c3c";
+            promoMessage.textContent = "Lỗi kết nối máy chủ.";
+            console.error(error);
+        }
+    });
+
+    // Format currency helper
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    }
+
+    // Khi submit form, đảm bảo gửi mã đã áp dụng
+    document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+        if (appliedPromoCode) {
+            document.getElementById("promoCode").value = appliedPromoCode;
+            document.getElementById("promoCode").disabled = false; // Enable để submit
+        }
+    });
 </script>
 
 </body>
