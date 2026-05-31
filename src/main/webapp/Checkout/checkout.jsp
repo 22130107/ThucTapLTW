@@ -181,11 +181,52 @@
         </div>
 
         <div class="form-group">
-            <label for="paymentMethod"><i class="fas fa-credit-card"></i> Phương thức thanh toán</label>
-            <select id="paymentMethod" name="paymentMethod">
-                <option value="COD">Thanh toán khi nhận hàng (COD)</option>
-                <option value="BankTransfer">Chuyển khoản ngân hàng</option>
-            </select>
+            <label><i class="fas fa-credit-card"></i> Phương thức thanh toán</label>
+
+            <!-- COD -->
+            <div class="payment-option" onclick="selectPayment('COD', this)">
+                <input type="radio" name="paymentMethod" id="pmCOD" value="COD" checked style="display:none">
+                <div class="payment-option-inner" id="lbl-COD" style="
+                    border:2px solid #2ecc71; border-radius:8px; padding:14px 18px;
+                    display:flex; align-items:center; gap:14px; cursor:pointer;
+                    background:#f0fdf4; margin-bottom:10px;">
+                    <i class="fas fa-money-bill-wave" style="color:#2ecc71;font-size:24px;"></i>
+                    <div>
+                        <div style="font-weight:700;color:#155724;">Thanh toán khi nhận hàng (COD)</div>
+                        <div style="font-size:13px;color:#666;">Trả tiền mặt khi nhận hàng</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEPAY QR Banking -->
+            <div class="payment-option" onclick="selectPayment('SEPAY', this)">
+                <input type="radio" name="paymentMethod" id="pmSEPAY" value="SEPAY" style="display:none">
+                <div class="payment-option-inner" id="lbl-SEPAY" style="
+                    border:2px solid #ddd; border-radius:8px; padding:14px 18px;
+                    display:flex; align-items:center; gap:14px; cursor:pointer;
+                    background:#fff; margin-bottom:10px;">
+                    <i class="fas fa-qrcode" style="color:#1abc9c;font-size:24px;"></i>
+                    <div>
+                        <div style="font-weight:700;color:#1abc9c;">Thanh toán QR Banking (SePay)</div>
+                        <div style="font-size:13px;color:#666;">Quét mã QR qua app ngân hàng – xác nhận tức thì</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BankTransfer -->
+            <div class="payment-option" onclick="selectPayment('BankTransfer', this)">
+                <input type="radio" name="paymentMethod" id="pmBank" value="BankTransfer" style="display:none">
+                <div class="payment-option-inner" id="lbl-BankTransfer" style="
+                    border:2px solid #ddd; border-radius:8px; padding:14px 18px;
+                    display:flex; align-items:center; gap:14px; cursor:pointer;
+                    background:#fff;">
+                    <i class="fas fa-exchange-alt" style="color:#2980b9;font-size:24px;"></i>
+                    <div>
+                        <div style="font-weight:700;color:#2980b9;">Chuyển khoản ngân hàng</div>
+                        <div style="font-size:13px;color:#666;">Chuyển khoản qua số tài khoản</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <button type="submit" class="btn-submit" id="btnSubmit">Đặt hàng ngay</button>
@@ -261,7 +302,6 @@
         }
     }
 
-    // ---- Tải danh sách phường/xã theo quận ----
     async function loadWards(districtId) {
         wardSelect.innerHTML = '<option value="">-- Chọn phường/xã --</option>';
         wardSelect.disabled  = true;
@@ -270,14 +310,14 @@
 
         wardHint.textContent = "Đang tải...";
         try {
-            const res  = await fetch(PROXY + "?type=ward&district_id=" + districtId);
+            const res = await fetch(PROXY + "?type=ward&district_id=" + districtId);
             const json = await res.json();
             if (json.code === 200 && json.data) {
                 json.data
                     .sort((a, b) => a.WardName.localeCompare(b.WardName, "vi"))
                     .forEach(w => {
                         const opt = document.createElement("option");
-                        opt.value       = w.WardCode;
+                        opt.value = w.WardCode;
                         opt.textContent = w.WardName;
                         wardSelect.appendChild(opt);
                     });
@@ -292,11 +332,42 @@
         }
     }
 
-    // ---- Sự kiện ----
     provinceSelect.addEventListener("change", () => loadDistricts(provinceSelect.value));
     districtSelect.addEventListener("change", () => loadWards(districtSelect.value));
 
-    // Validate trước khi submit
+    function selectPayment(value, el) {
+        document.querySelectorAll('.payment-option-inner').forEach(function (d) {
+            d.style.border = '2px solid #ddd';
+            d.style.background = '#fff';
+        });
+
+        const inner = document.getElementById('lbl-' + value);
+        if (inner) {
+            const colors = {
+                COD: '#2ecc71',
+                SEPAY: '#1abc9c',
+                BankTransfer: '#2980b9'
+            };
+            const bgs = {
+                COD: '#f0fdf4',
+                SEPAY: '#f0fdfb',
+                BankTransfer: '#eff7ff'
+            };
+            inner.style.border = '2px solid ' + (colors[value] || '#999');
+            inner.style.background = bgs[value] || '#fff';
+        }
+
+        const radio = document.getElementById('pm' + value);
+        if (radio) radio.checked = true;
+
+        const form = document.getElementById('checkoutForm');
+        if (value === 'SEPAY') {
+            form.action = 'payment/sepay';
+        } else {
+            form.action = 'checkout';
+        }
+    }
+
     document.getElementById("checkoutForm").addEventListener("submit", function (e) {
         if (!districtSelect.value || !wardSelect.value) {
             e.preventDefault();
@@ -304,8 +375,8 @@
         }
     });
 
-    // Khởi động
     loadProvinces();
+    selectPayment('COD', null);
 </script>
 
 </body>

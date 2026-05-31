@@ -173,4 +173,30 @@ public class OrderService {
 
         return payload;
     }
+
+    public int placeOrderAndReturnId(int customerId, String recipientName, String recipientPhone,
+                                     String shippingAddress, int toDistrictId, String toWardCode,
+                                     String paymentMethod) {
+        Cart cart = CartService.getInstance().getCart(customerId);
+        if (cart == null || cart.getData().isEmpty()) {
+            System.out.println("[OrderService] placeOrderAndReturnId failed: cart null or empty for customerId=" + customerId);
+            return -1;
+        }
+
+        Order order = new Order();
+        order.setCustomerId(customerId);
+        order.setTotalAmount(cart.getTotalPrice());
+        order.setStatus("Pending");
+        order.setRecipientName(recipientName);
+        order.setShippingAddress(shippingAddress);
+        order.setPaymentMethod(paymentMethod);
+
+        System.out.println("[OrderService] Creating order for customerId=" + customerId
+                + " toDistrictId=" + toDistrictId + " toWardCode=" + toWardCode
+                + " paymentMethod=" + paymentMethod);
+
+        int orderId = OrderDAO.getInstance().createOrder(order, cart, recipientPhone, toDistrictId, toWardCode);
+        System.out.println("[OrderService] createOrder returned orderId=" + orderId);
+        return orderId;
+    }
 }
