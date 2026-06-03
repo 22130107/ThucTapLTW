@@ -48,6 +48,11 @@
                         <a class="menu-item" href="categories">Danh mục</a>
                         <a class="menu-item" href="promocodes">Khuyến mãi</a>
                         <a class="menu-item" href="orders">Đơn hàng</a>
+                        <a class="menu-item" href="inventory">Kho hàng
+                            <c:if test="${lowStockCount > 0}">
+                                <span class="badge danger" style="float:right;">${lowStockCount}</span>
+                            </c:if>
+                        </a>
                     </nav>
                     <div class="sidebar-logout">
                         <a class="logout-btn" href="${pageContext.request.contextPath}/logout"
@@ -80,6 +85,12 @@
                             <h3>Tài khoản</h3>
                             <p class="value">${totalAccounts}</p>
                             <p class="sub">Thành viên đăng ký</p>
+                        </div>
+
+                        <div class="stat-card" style="border-left:4px solid ${lowStockCount > 0 ? '#ef4444' : '#10b981'};">
+                            <h3>Tồn kho thấp</h3>
+                            <p class="value" style="color:${lowStockCount > 0 ? '#ef4444' : '#10b981'};">${lowStockCount}</p>
+                            <p class="sub">Sản phẩm sắp hết hàng</p>
                         </div>
 
                     </section>

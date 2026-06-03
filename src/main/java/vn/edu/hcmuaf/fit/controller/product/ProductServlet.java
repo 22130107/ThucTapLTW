@@ -37,8 +37,10 @@ public class ProductServlet extends HttpServlet {
 
         String search = request.getParameter("q");
         List<Product> products = ProductService.getInstance().getProducts(categoryId, brands, priceRange, sort, search);
+        List<String> allBrands = ProductService.getInstance().getAllBrands();
 
         request.setAttribute("products", products);
+        request.setAttribute("allBrands", allBrands);
         request.setAttribute("selectedBrands", brands != null ? List.of(brands) : List.of());
         request.setAttribute("selectedPrice", priceRange);
         request.setAttribute("selectedSort", sort);

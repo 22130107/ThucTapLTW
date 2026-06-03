@@ -17,7 +17,9 @@ import com.google.gson.JsonObject;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import vn.edu.hcmuaf.fit.model.Cart;
+import vn.edu.hcmuaf.fit.model.CartItem;
 import vn.edu.hcmuaf.fit.model.Order;
 
 public class OrderService {
@@ -36,6 +38,17 @@ public class OrderService {
         if (cart == null || cart.getData().isEmpty()) {
             System.out.println("[OrderService] placeOrder failed: cart null or empty for customerId=" + customerId);
             return false;
+        }
+
+        // Kiểm tra tồn kho
+        for (Map.Entry<Integer, CartItem> entry : cart.getData().entrySet()) {
+            CartItem item = entry.getValue();
+            if (!InventoryService.getInstance().validateStock(item.getProduct().getId(), item.getQuantity())) {
+                System.out.println("[OrderService] Insufficient stock for product " + item.getProduct().getId()
+                        + " (" + item.getProduct().getName() + "): requested " + item.getQuantity()
+                        + ", available " + InventoryService.getInstance().getCurrentStock(item.getProduct().getId()));
+                return false;
+            }
         }
 
         Order order = new Order();

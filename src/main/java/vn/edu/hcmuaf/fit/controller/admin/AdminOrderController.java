@@ -3,7 +3,9 @@ package vn.edu.hcmuaf.fit.controller.admin;
 import vn.edu.hcmuaf.fit.dao.OrderDAO;
 import vn.edu.hcmuaf.fit.dao.OrderShippingGhnDAO;
 import vn.edu.hcmuaf.fit.model.Order;
+import vn.edu.hcmuaf.fit.model.OrderItem;
 import vn.edu.hcmuaf.fit.model.OrderShippingGhn;
+import vn.edu.hcmuaf.fit.service.InventoryService;
 import vn.edu.hcmuaf.fit.service.OrderService;
 import vn.edu.hcmuaf.fit.util.GhnStatusMapper;
 
@@ -96,9 +98,21 @@ public class AdminOrderController extends HttpServlet {
         // Xử lý theo trạng thái mới
         switch (newStatus) {
             case "Processing":
-                // Pending → Processing: Xác nhận đơn và tạo vận đơn GHN
+                // Pending → Processing: Xác nhận đơn, tạo vận đơn GHN, trừ tồn kho
                 if ("Pending".equals(currentStatus)) {
                     OrderService.getInstance().confirmOrderAndCreateGhn(orderId);
+
+                    // Trừ tồn kho
+                    List<OrderItem> items = OrderDAO.getInstance().getItems(orderId);
+                    List<InventoryService.OrderStockItem> stockItems = new java.util.ArrayList<>();
+                    for (OrderItem item : items) {
+                        stockItems.add(new InventoryService.OrderStockItem(item.getProductId(), item.getQuantity()));
+                    }
+                    boolean stockOk = InventoryService.getInstance().deductStockForOrder(orderId, stockItems);
+                    if (!stockOk) {
+                        System.out.println("[AdminOrderController] Stock deduction failed for order " + orderId);
+                    }
+
                     OrderDAO.getInstance().updateStatus(orderId, newStatus);
                 }
                 break;
@@ -120,6 +134,15 @@ public class AdminOrderController extends HttpServlet {
             case "Cancelled":
                 // Chỉ cho hủy khi đơn đang Pending hoặc Processing
                 if ("Pending".equals(currentStatus) || "Processing".equals(currentStatus)) {
+                    // Nếu đã trừ kho (đang Processing) thì hoàn lại
+                    if ("Processing".equals(currentStatus)) {
+                        List<OrderItem> items = OrderDAO.getInstance().getItems(orderId);
+                        List<InventoryService.OrderStockItem> stockItems = new java.util.ArrayList<>();
+                        for (OrderItem item : items) {
+                            stockItems.add(new InventoryService.OrderStockItem(item.getProductId(), item.getQuantity()));
+                        }
+                        InventoryService.getInstance().restoreStockForOrder(orderId, stockItems);
+                    }
                     OrderDAO.getInstance().updateStatus(orderId, newStatus);
                 }
                 break;
