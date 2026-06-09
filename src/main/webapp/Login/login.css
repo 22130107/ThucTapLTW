@@ -370,9 +370,8 @@ body {
 .btn-social:hover { background: #fafafa; border-color: #d1d5db; transform: translateY(-1px); }
 .btn-social:active { transform: translateY(0); }
 
-.btn-social.btn-email:hover  { border-color: var(--primary); color: var(--primary); }
-.btn-social.btn-zalo:hover   { border-color: #0068FF; color: #0068FF; background: #f0f6ff; }
-.btn-social.btn-google:hover { border-color: #ea4335; color: #ea4335; background: #fff5f5; }
+.btn-social.btn-zalo:hover     { border-color: #0068FF; color: #0068FF; background: #f0f6ff; }
+.btn-social.btn-google:hover   { border-color: #ea4335; color: #ea4335; background: #fff5f5; }
 
 /* ===== TOAST ===== */
 .toast-container {

@@ -159,7 +159,14 @@ public class UserDAO {
     }
 
     public void registerGoogle(String email, String name, String avatarUrl) {
-        String username = email.split("@")[0];
+        // Tạo username từ phần trước @ của email, đảm bảo không trùng
+        String baseUsername = email.split("@")[0].replaceAll("[^a-zA-Z0-9_]", "");
+        String username = baseUsername;
+        int suffix = 1;
+        while (checkUserExist(username)) {
+            username = baseUsername + suffix;
+            suffix++;
+        }
         String randomPass = vn.edu.hcmuaf.fit.service.UserService.getInstance().hashPassword(
                 "GOOGLE_LOGIN_" + System.currentTimeMillis());
         register(username, randomPass, email);

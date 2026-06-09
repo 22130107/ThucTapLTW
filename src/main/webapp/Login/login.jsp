@@ -47,11 +47,16 @@
         <p>Vui lòng nhập thông tin tài khoản của bạn</p>
       </div>
 
-      <!-- Lỗi từ server -->
-      <% if (request.getAttribute("error") != null) { %>
+      <!-- Lỗi từ server hoặc từ redirect -->
+      <%
+        String serverError = (String) request.getAttribute("error");
+        String paramError  = request.getParameter("error");
+        String displayError = serverError != null ? serverError : paramError;
+      %>
+      <% if (displayError != null) { %>
       <div class="server-error">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <%= request.getAttribute("error") %>
+        <%= displayError %>
       </div>
       <% } %>
 
@@ -116,26 +121,16 @@
 
       <!-- Social login -->
       <div class="social-buttons">
-        <button type="button" class="btn-social btn-email">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-          </svg>
-          Đăng nhập bằng Email
-        </button>
-
-        <button type="button" class="btn-social btn-zalo">
+        <a href="${pageContext.request.contextPath}/login-zalo" class="btn-social btn-zalo">
           <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect width="48" height="48" rx="10" fill="#0068FF"/>
             <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="20" fill="white">Z</text>
           </svg>
           Đăng nhập bằng Zalo
-        </button>
+        </a>
 
         <%
-          String googleClientId = "1055685939412-k630p44torb19vi19th2gpu20n6ulhev.apps.googleusercontent.com";
-          String redirectUri = "http://localhost:8080/webapp_war/login-google";
-          String googleLoginLink = "https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri="
-                  + redirectUri + "&response_type=code&client_id=" + googleClientId + "&approval_prompt=force";
+          String googleLoginLink = vn.edu.hcmuaf.fit.util.GoogleUtils.buildLoginUrl();
         %>
         <a href="<%= googleLoginLink %>" class="btn-social btn-google">
           <i class="fa-brands fa-google" style="font-size:17px;color:#ea4335;" aria-hidden="true"></i>
@@ -265,9 +260,9 @@ function showToast(msg, type) {
 }
 
 /* Hiện toast lỗi từ server nếu có */
-<% if (request.getAttribute("error") != null) { %>
+<% if (displayError != null) { %>
 window.addEventListener('DOMContentLoaded', function() {
-    showToast('<%= request.getAttribute("error") %>', 'error');
+    showToast('<%= displayError.replace("'", "\\'") %>', 'error');
 });
 <% } %>
 </script>
