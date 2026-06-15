@@ -23,141 +23,145 @@
 
                 <div class="container">
                     <div class="product">
-                        <div class="product-gallery" id="gallery">
-                            <div class="main-image" aria-live="polite">
-                                <img id="mainImg" src="${product.img}" alt="${product.name}">
-                            </div>
-                            <div class="thumb-row">
-                                <button class="btn-nav" id="btnPrev" aria-label="Ảnh trước">&larr;</button>
-                                <div class="thumb-viewport">
-                                    <div class="thumbs" id="thumbs" role="list">
-                                        <div class="thumb is-active" role="listitem" data-index="0">
-                                            <img src="${product.img}" alt="${product.name}">
-                                        </div>
-                                    </div>
+                        <div class="product-left">
+                            <div class="product-gallery" id="gallery">
+                                <div class="main-image" aria-live="polite">
+                                    <img id="mainImg" src="${product.img}" alt="${product.name}">
                                 </div>
-                                <button class="btn-nav" id="btnNext" aria-label="Ảnh sau">&rarr;</button>
-                            </div>
-                        </div>
-
-                        <div class="detail">
-                            <section id="product-panel" class="product-panel">
-                                <h1 class="prod-title">${product.name}</h1>
-                                <div class="divider"></div>
-
-                                <div class="price-wrap">
-                                    <div class="price-new" id="price-new">
-                                        <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="đ" />
-                                    </div>
-                                    <c:if test="${product.oldPrice > product.price}">
-                                        <div class="price-old" id="price-old">
-                                            <fmt:formatNumber value="${product.oldPrice}" type="currency"
-                                                currencySymbol="đ" />
-                                        </div>
-                                        <div class="price-off" id="price-off">
-                                            -
-                                            <fmt:formatNumber value="${(1 - product.price / product.oldPrice) * 100}"
-                                                maxFractionDigits="0" />%
-                                        </div>
-                                    </c:if>
-                                    <div class="vat-note">(Đã gồm VAT)</div>
-                                </div>
-
-                                <div class="grid">
-                                    <div class="label">Chọn kho hàng:</div>
-                                    <div class="seg" role="tablist" aria-label="Kho hàng">
-                                        <button class="seg-btn active" data-region="north" role="tab"
-                                            aria-selected="true">Miền Bắc</button>
-                                        <button class="seg-btn" data-region="south" role="tab"
-                                            aria-selected="false">Miền Nam: +200.000đ</button>
-                                    </div>
-
-                                    <div class="label">Trạng thái:</div>
-                                    <div class="status">${product.stock > 0 ? "Còn hàng" : "Hết hàng"}</div>
-                                </div>
-
-                                <div class="qty-row">
-                                    <div class="label">Chọn số lượng:</div>
-                                    <div class="qty" aria-label="Số lượng">
-                                        <button class="qty-minus" aria-label="Giảm">−</button>
-                                        <input id="qtyInput" class="qty-input" type="text" value="1" readonly>
-                                        <button class="qty-plus" aria-label="Tăng">+</button>
-                                    </div>
-                                    <button id="btnAddToCart" class="add-cart"><i class="fa-solid fa-cart-plus"></i> Cho
-                                        vào giỏ</button>
-                                </div>
-
-                                <div class="actions">
-                                    <button id="btnBuyNow" class="btn btn-buy"><i
-                                            class="fa-solid fa-cart-shopping"></i>Đặt mua</button>
-                                    <button class="btn btn-call"><i class="fa-solid fa-headset"></i>Tư vấn</button>
-                                    <button class="btn btn-credit"><i class="fa-solid fa-coins"></i>Trả góp</button>
-                                </div>
-
-                                <div class="benefits">
-                                    <div class="benefit"><i class="fa-solid fa-truck-fast"></i>Miễn phí giao hàng trong
-                                        nội thành Hà Nội và nội thành TP. Hồ Chí Minh. <a href="#"
-                                            style="margin-left:6px;color:#0ea5e9;text-decoration:none;">(Xem thêm)</a>
-                                    </div>
-                                    <div class="benefit"><i class="fa-solid fa-file-invoice"></i>Được hàng trăm ngàn
-                                        Doanh nghiệp tại Việt Nam lựa chọn: đầy đủ hóa đơn, hợp đồng, không chi phí ẩn
-                                        <a href="#" style="margin-left:6px;color:#0ea5e9;text-decoration:none;">(Xem
-                                            thêm)</a>
-                                    </div>
-                                    <div class="benefit"><i class="fa-solid fa-shield-heart"></i>Bảo hành toàn quốc. <a
-                                            href="#" style="margin-left:6px;color:#0ea5e9;text-decoration:none;">(Xem
-                                            trung tâm bảo hành)</a></div>
-                                </div>
-                            </section>
-                        </div>
-
-                        <div class="product-info">
-                            <article class="product-card">
-                                <div id="descWrap" class="collapse-wrap">
-                                    ${product.description}
-                                </div>
-                                <div class="toggle-btn-wrap">
-                                    <button id="toggleDesc" class="toggle-btn">Xem tất cả ▼</button>
-                                </div>
-                            </article>
-                        </div>
-
-                        <div id="viewed-root">
-                            <aside class="viewed-panel viewed--compact" aria-labelledby="viewed-title">
-                                <div class="viewed-header">
-                                    <h3 id="viewed-title">Sản phẩm khác</h3>
-                                    <a class="btn-view-all" href="${pageContext.request.contextPath}/catalog">Xem tất
-                                        cả</a>
-                                </div>
-                                <ul class="viewed-list" role="list">
-                                    <c:forEach var="rp" items="${relatedProducts}">
-                                        <li class="viewed-item">
-                                            <div class="viewed-thumb">
-                                                <c:if test="${not empty rp.badge}">
-                                                    <span class="badge-sale">-${rp.badge}</span>
-                                                </c:if>
-                                                <img src="${rp.img}" alt="${rp.name}" loading="lazy">
+                                <div class="thumb-row">
+                                    <button class="btn-nav" id="btnPrev" aria-label="Ảnh trước">&larr;</button>
+                                    <div class="thumb-viewport">
+                                        <div class="thumbs" id="thumbs" role="list">
+                                            <div class="thumb is-active" role="listitem" data-index="0">
+                                                <img src="${product.img}" alt="${product.name}">
                                             </div>
-                                            <div class="viewed-info">
-                                                <a href="${pageContext.request.contextPath}/product-detail?id=${rp.id}"
-                                                    class="viewed-name">${rp.name}</a>
-                                                <div class="viewed-price">
-                                                    <span class="price-now">
-                                                        <fmt:formatNumber value="${rp.price}" type="currency"
-                                                            currencySymbol="đ" />
-                                                    </span>
-                                                    <c:if test="${rp.oldPrice > rp.price}">
-                                                        <s class="price-old">
-                                                            <fmt:formatNumber value="${rp.oldPrice}" type="currency"
-                                                                currencySymbol="đ" />
-                                                        </s>
+                                        </div>
+                                    </div>
+                                    <button class="btn-nav" id="btnNext" aria-label="Ảnh sau">&rarr;</button>
+                                </div>
+                            </div>
+
+                            <div class="product-info">
+                                <article class="product-card">
+                                    <div id="descWrap" class="collapse-wrap">
+                                        ${product.description}
+                                    </div>
+                                    <div class="toggle-btn-wrap">
+                                        <button id="toggleDesc" class="toggle-btn">Xem tất cả ▼</button>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+
+                        <div class="product-right">
+                            <div class="detail">
+                                <section id="product-panel" class="product-panel">
+                                    <h1 class="prod-title">${product.name}</h1>
+                                    <div class="divider"></div>
+
+                                    <div class="price-wrap">
+                                        <div class="price-new" id="price-new">
+                                            <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="đ" />
+                                        </div>
+                                        <c:if test="${product.oldPrice > product.price}">
+                                            <div class="price-old" id="price-old">
+                                                <fmt:formatNumber value="${product.oldPrice}" type="currency"
+                                                    currencySymbol="đ" />
+                                            </div>
+                                            <div class="price-off" id="price-off">
+                                                -
+                                                <fmt:formatNumber value="${(1 - product.price / product.oldPrice) * 100}"
+                                                    maxFractionDigits="0" />%
+                                            </div>
+                                        </c:if>
+                                        <div class="vat-note">(Đã gồm VAT)</div>
+                                    </div>
+
+                                    <div class="grid">
+                                        <div class="label">Chọn kho hàng:</div>
+                                        <div class="seg" role="tablist" aria-label="Kho hàng">
+                                            <button class="seg-btn active" data-region="north" role="tab"
+                                                aria-selected="true">Miền Bắc</button>
+                                            <button class="seg-btn" data-region="south" role="tab"
+                                                aria-selected="false">Miền Nam: +200.000đ</button>
+                                        </div>
+
+                                        <div class="label">Trạng thái:</div>
+                                        <div class="status">${product.stock > 0 ? "Còn hàng" : "Hết hàng"}</div>
+                                    </div>
+
+                                    <div class="qty-row">
+                                        <div class="label">Chọn số lượng:</div>
+                                        <div class="qty" aria-label="Số lượng">
+                                            <button class="qty-minus" aria-label="Giảm">−</button>
+                                            <input id="qtyInput" class="qty-input" type="text" value="1" readonly>
+                                            <button class="qty-plus" aria-label="Tăng">+</button>
+                                        </div>
+                                        <button id="btnAddToCart" class="add-cart"><i class="fa-solid fa-cart-plus"></i> Cho
+                                            vào giỏ</button>
+                                    </div>
+
+                                    <div class="actions">
+                                        <button id="btnBuyNow" class="btn btn-buy"><i
+                                                class="fa-solid fa-cart-shopping"></i>Đặt mua</button>
+                                        <button class="btn btn-call"><i class="fa-solid fa-headset"></i>Tư vấn</button>
+                                        <button class="btn btn-credit"><i class="fa-solid fa-coins"></i>Trả góp</button>
+                                    </div>
+
+                                    <div class="benefits">
+                                        <div class="benefit"><i class="fa-solid fa-truck-fast"></i>Miễn phí giao hàng trong
+                                            nội thành Hà Nội và nội thành TP. Hồ Chí Minh. <a href="#"
+                                                style="margin-left:6px;color:#0ea5e9;text-decoration:none;">(Xem thêm)</a>
+                                        </div>
+                                        <div class="benefit"><i class="fa-solid fa-file-invoice"></i>Được hàng trăm ngàn
+                                            Doanh nghiệp tại Việt Nam lựa chọn: đầy đủ hóa đơn, hợp đồng, không chi phí ẩn
+                                            <a href="#" style="margin-left:6px;color:#0ea5e9;text-decoration:none;">(Xem
+                                                thêm)</a>
+                                        </div>
+                                        <div class="benefit"><i class="fa-solid fa-shield-heart"></i>Bảo hành toàn quốc. <a
+                                                href="#" style="margin-left:6px;color:#0ea5e9;text-decoration:none;">(Xem
+                                                trung tâm bảo hành)</a></div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div id="viewed-root">
+                                <aside class="viewed-panel viewed--compact" aria-labelledby="viewed-title">
+                                    <div class="viewed-header">
+                                        <h3 id="viewed-title">Sản phẩm khác</h3>
+                                        <a class="btn-view-all" href="${pageContext.request.contextPath}/catalog">Xem tất
+                                            cả</a>
+                                    </div>
+                                    <ul class="viewed-list" role="list">
+                                        <c:forEach var="rp" items="${relatedProducts}">
+                                            <li class="viewed-item">
+                                                <div class="viewed-thumb">
+                                                    <c:if test="${not empty rp.badge}">
+                                                        <span class="badge-sale">-${rp.badge}</span>
                                                     </c:if>
+                                                    <img src="${rp.img}" alt="${rp.name}" loading="lazy">
                                                 </div>
-                                            </div>
-                                        </li>
-                                    </c:forEach>
-                                </ul>
-                            </aside>
+                                                <div class="viewed-info">
+                                                    <a href="${pageContext.request.contextPath}/product-detail?id=${rp.id}"
+                                                        class="viewed-name">${rp.name}</a>
+                                                    <div class="viewed-price">
+                                                        <span class="price-now">
+                                                            <fmt:formatNumber value="${rp.price}" type="currency"
+                                                                currencySymbol="đ" />
+                                                        </span>
+                                                        <c:if test="${rp.oldPrice > rp.price}">
+                                                            <s class="price-old">
+                                                                <fmt:formatNumber value="${rp.oldPrice}" type="currency"
+                                                                    currencySymbol="đ" />
+                                                            </s>
+                                                        </c:if>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </c:forEach>
+                                    </ul>
+                                </aside>
+                            </div>
                         </div>
                     </div>
 

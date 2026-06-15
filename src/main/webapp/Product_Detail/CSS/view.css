@@ -76,12 +76,15 @@
     display: grid;
     place-items: center;
     position: relative;
+    overflow: hidden;
 }
 
 .viewed-thumb img {
     width: 88%;
     height: 88%;
     object-fit: contain;
+    color: transparent;
+    font-size: 0;
 }
 
 .badge-sale {
