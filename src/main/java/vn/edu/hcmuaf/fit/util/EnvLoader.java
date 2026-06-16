@@ -85,7 +85,7 @@ public class EnvLoader {
             int idx = line.indexOf('=');
             if (idx < 1) continue;
             String key   = line.substring(0, idx).trim();
-            String value = line.substring(idx + 1).trim();
+            String value = line.substring(idx + 1).trim().replace("\r", "");
             vars.put(key, value);
         }
         return vars;
