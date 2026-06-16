@@ -15,6 +15,78 @@
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/style/header/header.css">
             </head>
 
+            <div id="confirmModal"
+                 style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+
+                <div style="background:#fff;border-radius:10px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);text-align:center;">
+
+                    <div style="font-size:2rem;margin-bottom:8px;">XÓA?</div>
+                    <h3 style="margin:0 0 8px;font-size:1.1rem;">
+                        Xác nhận xóa sản phẩm khỏi giỏ?
+                    </h3>
+                    <p id="modalProductName"
+                       style="color:#555;font-size:.95rem;margin:0 0 20px;">
+                    </p>
+                    <div style="display:flex;gap:12px;justify-content:center;">
+                        <button
+                                onclick="closeConfirmModal()"
+                                style="padding:8px 22px;border:1px solid #ccc;border-radius:6px;background:#f5f5f5;cursor:pointer;font-size:.95rem;">Hủy</button>
+                        <button
+                                id="modalConfirmBtn"
+                                style="padding:8px 22px;border:none;border-radius:6px;background:#d32f2f;color:#fff;cursor:pointer;font-size:.95rem;font-weight:bold;">
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script src="${pageContext.request.contextPath}/style/header/header.js"></script>
+            <script src="${pageContext.request.contextPath}/style/footer/footer.js"></script>
+
+            <script>
+                function updateCart(id, quantity) {
+                    fetch('${pageContext.request.contextPath}/add-to-cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'action=update&id=' + id + '&quantity=' + quantity
+                    })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                location.reload();
+                            } else {
+                                alert(data.message);
+                            }
+                        });
+                }
+
+                let _pendingRemoveId = null;
+                function confirmRemove(id, name) {
+                    _pendingRemoveId = id;
+                    document.getElementById('modalProductName').textContent = name;
+                    const modal = document.getElementById('confirmModal');
+                    modal.style.display = 'flex';
+                    document.getElementById('modalConfirmBtn').onclick = function () {
+                        modal.style.display = 'none';
+                        updateCart(_pendingRemoveId, 0);
+                    };
+                }
+
+                function closeConfirmModal() {
+                    document.getElementById('confirmModal').style.display = 'none';
+                    _pendingRemoveId = null;
+                }
+
+                document.getElementById('confirmModal')
+                    .addEventListener('click', function (e) {
+                        if (e.target === this) {
+                            closeConfirmModal();
+                        }
+                    });
+            </script>
+
             <body>
                 <jsp:include page="/style/header/header.jsp" />
 
@@ -65,7 +137,7 @@
                                             </td>
                                             <td>
                                                 <button class="remove-btn" title="Xóa"
-                                                    onclick="updateCart(${item.product.id}, 0)">
+                                                        onclick="confirmRemove(${item.product.id}, '${item.product.name}')">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </td>
