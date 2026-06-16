@@ -99,9 +99,8 @@ public class AdminProductController extends HttpServlet {
 
         String action = request.getParameter("action");
         HttpSession session = request.getSession();
-        String queryString = buildBaseQueryString(request.getParameter("q"), request.getParameter("brand"),
-                request.getParameter("status"), request.getParameter("price"));
-        String redirectUrl = request.getContextPath() + "/admin/products" + (queryString.isEmpty() ? "" : "?" + queryString);
+        String queryString = request.getQueryString();
+        String redirectUrl = request.getContextPath() + "/admin/products" + (queryString != null && !queryString.isEmpty() ? "?" + queryString : "");
 
         if ("bulkDelete".equals(action)) {
             String[] ids = request.getParameterValues("selectedIds");

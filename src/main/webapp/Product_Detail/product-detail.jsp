@@ -125,7 +125,7 @@
                                 </section>
                             </div>
 
-                            <div id="viewed-root">
+                            <div id="viewed-root" style="width: 100%; align-self: stretch;">
                                 <aside class="viewed-panel viewed--compact" aria-labelledby="viewed-title">
                                     <div class="viewed-header">
                                         <h3 id="viewed-title">Sản phẩm khác</h3>
