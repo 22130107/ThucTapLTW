@@ -5,9 +5,9 @@
 
 #viewed-root {
     grid-column: 2 / 3;
-    align-self: start;
     position: sticky;
     top: 146px;
+    width: 100%;
 }
 
 .viewed-panel {

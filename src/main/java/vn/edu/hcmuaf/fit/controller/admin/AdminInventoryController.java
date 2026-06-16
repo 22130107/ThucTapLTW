@@ -28,17 +28,41 @@ public class AdminInventoryController extends HttpServlet {
         }
 
         String tab = request.getParameter("tab");
-        if (tab == null) tab = "list";
+        if (tab == null) tab = "dashboard";
 
         InventoryService is = InventoryService.getInstance();
+        vn.edu.hcmuaf.fit.service.CategoryService cs = vn.edu.hcmuaf.fit.service.CategoryService.getInstance();
 
         List<Product> allProducts = ProductService.getInstance()
                 .getAdminProducts(null, null, null, null, 0, 99999);
+        List<vn.edu.hcmuaf.fit.model.Category> categories = cs.getAll();
+
+        int totalVariants = allProducts.size();
+        int totalStock = 0;
+        int outOfStock = 0;
+        int lowStock = 0;
+        double inventoryValue = 0;
+
+        for (Product p : allProducts) {
+            totalStock += p.getStock();
+            inventoryValue += (p.getStock() * p.getPrice());
+            if (p.getStock() == 0) {
+                outOfStock++;
+            } else if (p.getStock() <= 5) {
+                lowStock++;
+            }
+        }
 
         request.setAttribute("products", allProducts);
+        request.setAttribute("categories", categories);
         request.setAttribute("transactions", is.getAllTransactions());
         request.setAttribute("currentTab", tab);
-        request.setAttribute("lowStockCount", is.countLowStockProducts());
+        
+        request.setAttribute("statTotalVariants", totalVariants);
+        request.setAttribute("statTotalStock", totalStock);
+        request.setAttribute("statOutOfStock", outOfStock);
+        request.setAttribute("statLowStock", lowStock);
+        request.setAttribute("statInventoryValue", inventoryValue);
 
         if ("detail".equals(tab)) {
             String idStr = request.getParameter("id");

@@ -184,7 +184,7 @@
                         <section class="card" style="margin-top:16px; padding:14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
                             <div style="color:#444;">Tổng <strong>${totalItems}</strong> sản phẩm</div>
                             <div class="pagination" style="display:flex; gap:6px; flex-wrap:wrap;">
-                                <c:set var="queryPrefix" value="${not empty queryString ? queryString + '&' : ''}" />
+                                <c:set var="queryPrefix" value="${queryString}${not empty queryString ? '&' : ''}" />
                                 <c:if test="${currentPage > 1}">
                                     <a class="btn btn-ghost" href="products?${queryPrefix}page=${currentPage-1}&size=${pageSize}">Trang trước</a>
                                 </c:if>
@@ -208,7 +208,7 @@
                     <a href="#" class="modal-overlay" aria-label="Đóng"></a>
                     <div class="modal-body">
                         <h3>Thêm sản phẩm</h3>
-                        <form class="form" action="products" method="post">
+                        <form class="form" action="products${not empty queryString ? '?' : ''}${queryString}" method="post">
                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <input type="hidden" name="action" value="add">
                             <label>Tên
@@ -259,7 +259,7 @@
                     <a href="#" class="modal-overlay" aria-label="Đóng"></a>
                     <div class="modal-body">
                         <h3>Sửa sản phẩm</h3>
-                        <form class="form" id="form-edit" action="products" method="post">
+                        <form class="form" id="form-edit" action="products${not empty queryString ? '?' : ''}${queryString}" method="post">
                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <input type="hidden" name="action" value="update">
                             <input type="hidden" name="id" id="edit-id">
@@ -313,7 +313,7 @@
                     <div class="modal-body">
                         <h3>Xóa sản phẩm?</h3>
                         <p>Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.</p>
-                        <form action="products" method="post">
+                        <form action="products${not empty queryString ? '?' : ''}${queryString}" method="post">
                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" id="delete-id">
@@ -331,7 +331,7 @@
                     <div class="modal-body">
                         <h3>Xóa các sản phẩm đã chọn?</h3>
                         <p>Bạn có chắc chắn muốn xóa những sản phẩm này không? Hành động này không thể hoàn tác.</p>
-                        <form id="bulk-delete-form" action="products" method="post">
+                        <form id="bulk-delete-form" action="products${not empty queryString ? '?' : ''}${queryString}" method="post">
                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <input type="hidden" name="action" value="bulkDelete">
                             <div id="bulk-selected-inputs"></div>
@@ -412,17 +412,17 @@
                     }
 
                     document.getElementById('btn-edit').addEventListener('click', function (e) {
+                        e.preventDefault();
+                        
                         // Find checked checkboxes in table body
                         const checks = document.querySelectorAll('tbody input[type="checkbox"]:checked');
 
                         if (checks.length === 0) {
-                            e.preventDefault();
                             alert('Vui lòng chọn một sản phẩm để sửa!');
                             return;
                         }
 
                         if (checks.length > 1) {
-                            e.preventDefault();
                             alert('Chỉ được chọn 1 sản phẩm để sửa!');
                             return;
                         }
@@ -458,19 +458,23 @@
                         // Set CKEditor data
                         if (data.description) {
                             CKEDITOR.instances['edit-desc'].setData(data.description);
+                        } else {
+                            CKEDITOR.instances['edit-desc'].setData('');
                         }
+                        
+                        location.hash = '#modal-edit';
                     });
                     document.getElementById('btn-delete').addEventListener('click', function (e) {
+                        e.preventDefault();
+                        
                         const checks = document.querySelectorAll('tbody input[type="checkbox"]:checked');
 
                         if (checks.length === 0) {
-                            e.preventDefault();
                             alert('Vui lòng chọn một sản phẩm để xóa!');
                             return;
                         }
 
                         if (checks.length > 1) {
-                            e.preventDefault();
                             alert('Vui lòng chỉ chọn 1 sản phẩm để xóa!');
                             return;
                         }
@@ -478,6 +482,7 @@
                         const tr = checks[0].closest('tr');
                         const id = tr.dataset.id;
                         document.getElementById('delete-id').value = id;
+                        location.hash = '#modal-delete';
                     });
 
                     document.getElementById('btn-bulk-delete').addEventListener('click', function (e) {
